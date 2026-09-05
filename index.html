@@ -1,54 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>POLARIS OPS — Digital Twin Test</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POLARIS OPS — Antarctic Digital Twin</title>
+<meta name="description" content="POLARIS Antarctic research station digital twin and operations console.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=polaris-ice-2">
 </head>
 <body>
-<div class="shell">
-  <header class="header">
-    <div class="brand"><div class="mark">P</div><div><b>POLARIS OPS</b><span>ANTARCTIC DIGITAL TWIN // TEST</span></div></div>
-    <div class="station">MAITRI STATION <span>//</span> 70.76° S, 11.74° E</div>
-    <div class="clock" id="clock">--:--:-- UTC</div>
-  </header>
-
-  <aside class="sidebar">
-    <div class="kicker">OPERATIONAL MODULES</div>
-    <button class="module active" data-module="ground"><b>01</b><span>GROUND STATION<small>Satellite / DRS / RF</small></span></button>
-    <button class="module" data-module="meteorology"><b>02</b><span>METEOROLOGY<small>Wind / pressure / atmosphere</small></span></button>
-    <button class="module" data-module="compliance"><b>03</b><span>COMPLIANCE<small>Permits / EIA / biosecurity</small></span></button>
-    <button class="module" data-module="well-being"><b>04</b><span>WELL-BEING<small>Anonymous crew check-ins</small></span></button>
-    <button class="module" data-module="infrastructure"><b>05</b><span>INFRASTRUCTURE<small>Assets / heritage / access</small></span></button>
-    <div class="status-card"><div class="kicker">BACKEND LINK</div><strong id="backendState">CHECKING…</strong><p id="backendSource">Telemetry gateway</p></div>
-  </aside>
-
-  <main class="main">
-    <section class="hero"><div><div class="kicker">POLAR RESEARCH COMPLEX // DIGITAL TWIN</div><h1>LIVE OPERATIONS CONSOLE</h1><p>Sensor → MQTT → FastAPI → risk engine → this browser.</p></div><div class="risk-chip" id="riskChip">NO DATA</div></section>
-
-    <section class="telemetry">
-      <div class="panel-head"><span>LIVE TELEMETRY</span><small id="telemetryUpdated">WAITING</small></div>
-      <div class="metrics">
-        <div><label>TEMPERATURE</label><strong id="temperature">NO DATA</strong></div>
-        <div><label>WIND</label><strong id="wind">NO DATA</strong></div>
-        <div><label>PRESSURE</label><strong id="pressure">NO DATA</strong></div>
-        <div><label>HUMIDITY</label><strong id="humidity">NO DATA</strong></div>
-        <div><label>RISK SCORE</label><strong id="riskScore">—</strong></div>
-        <div><label>TRANSPORT</label><strong id="transport">OFFLINE</strong></div>
-      </div>
-    </section>
-
-    <section class="twin-grid">
-      <div class="panel scene"><div class="panel-head"><span>STATION DIGITAL TWIN</span><small>DT-01</small></div><div class="scene-inner" id="scene"><div class="orbit o1"></div><div class="orbit o2"></div><div class="station-core"><i></i><b>MAITRI</b><small>STATION CORE</small></div><div class="asset weather" data-asset="weather">MET</div><div class="asset power" data-asset="power">PWR</div><div class="asset comms" data-asset="communications">RF</div><div class="runway"></div><div class="risk-zone rz1"></div><div class="risk-zone rz2"></div><div class="north">N</div></div></div>
-      <div class="panel detail"><div class="panel-head"><span>SELECTED MODULE</span><small id="moduleLabel">GROUND STATION</small></div><div class="detail-body"><iframe id="moduleFrame" title="Operational module" src="legacy-operations.html?module=ground"></iframe></div></div>
-    </section>
-  </main>
+<div class="app-shell">
+<header class="global-header"><div class="brand-lockup"><div class="brand-mark">P</div><div><div class="brand-title">POLARIS OPS</div><div class="brand-subtitle">ANTARCTIC DIGITAL TWIN // DT-01</div></div></div><div class="header-center"><span class="live-dot"></span><span>MAITRI RESEARCH STATION</span><span class="header-sep">//</span><span>70.76° S, 11.74° E</span></div><div class="header-meta"><span id="backendMode">DEMO MODE</span><strong id="utcClock">--:--:-- UTC</strong></div></header>
+<section class="operation-timeline"><div class="timeline-label">OPERATION TIMELINE</div><div class="timeline-track"><button class="timeline-item active" data-focus="communications"><span>08:30</span><b>SATELLITE PASS</b></button><button class="timeline-item" data-focus="weather"><span>09:10</span><b>WEATHER OBSERVATION</b></button><button class="timeline-item" data-focus="power"><span>10:20</span><b>MAINTENANCE</b></button><button class="timeline-item" data-focus="runway"><span>11:45</span><b>FIELD OBSERVATION</b></button><button class="timeline-item" data-focus="heritage"><span>12:30</span><b>COMPLIANCE EVENT</b></button></div></section>
+<aside class="station-compartments"><div class="compartment-head"><span>STATION</span><strong>COMPARTMENTS</strong></div><button class="module compartment active" data-module="ground"><i class="c-building"></i><span><b>GROUND STATION</b><small>Satellite / DRS / RF</small></span></button><button class="module compartment" data-module="meteorology"><i class="c-weather"></i><span><b>METEOROLOGY</b><small>Wind / pressure / atmosphere</small></span></button><button class="module compartment" data-module="compliance"><i class="c-heritage"></i><span><b>COMPLIANCE</b><small>Permits / EIA / biosecurity</small></span></button><button class="module compartment" data-module="well-being"><i class="c-well"></i><span><b>WELL-BEING</b><small>Anonymous crew check-ins</small></span></button><button class="module compartment" data-module="infrastructure"><i class="c-access"></i><span><b>INFRASTRUCTURE</b><small>Assets / heritage / access</small></span></button><div class="compartment-legend"><span><i class="legend-dot building"></i>Infrastructure</span><span><i class="legend-dot comms"></i>Comms</span><span><i class="legend-dot power"></i>Energy</span><span><i class="legend-dot weather"></i>Science</span></div></aside>
+<main class="center-panel"><header class="topbar"><div class="topbar-row"><div><div class="eyebrow">POLAR RESEARCH COMPLEX // MAITRI</div><h1>LIVE DIGITAL TWIN</h1></div><div class="toolbar"><button class="icon-btn" data-action="zoom-in">+</button><button class="icon-btn" data-action="zoom-out">−</button><button class="icon-btn" data-action="reset">RESET</button></div></div><div class="layer-controls"><button class="layer-btn active" data-layer="infrastructure">INFRASTRUCTURE</button><button class="layer-btn active" data-layer="weather">WEATHER</button><button class="layer-btn active" data-layer="wind">WIND</button><button class="layer-btn" data-layer="satellites">SATELLITES</button><button class="layer-btn" data-layer="risk">RISK</button></div></header>
+<section class="map-wrapper" id="mapWrapper" aria-label="Maitri station digital twin"><div class="map-stage" id="mapStage"><div class="ice-grid"></div><div class="ice-mass mass-a"></div><div class="ice-mass mass-b"></div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="wind-stream ws-a"></div><div class="wind-stream ws-b"></div><div class="wind-stream ws-c"></div><div class="risk-zone zone-a"></div><div class="risk-zone zone-b"></div><div class="runway"></div><button class="asset-group station-node selected" data-asset="main-station"><span class="node-light"></span><b>MAITRI</b><small>STATION CORE</small></button><button class="asset-group node-weather" data-asset="weather"><b>MET</b><small>WEATHER</small></button><button class="asset-group node-power" data-asset="power"><b>PWR</b><small>ENERGY</small></button><button class="asset-group node-comms" data-asset="communications"><b>RF</b><small>COMMS</small></button><div class="sat sat-a" data-asset="satellite-a">SAT-A</div><div class="sat sat-b" data-asset="satellite-b">SAT-B</div><div class="north">N</div><div class="scene-hud"><span>SCENE // DT-01</span><span id="sceneZoomReadout">ZOOM 100%</span></div><div class="scene-mode">LIVE-STYLE DIGITAL TWIN</div></div></section></main>
+<aside class="right-panel"><section class="panel telemetry-panel"><div class="panel-head"><span>LIVE TELEMETRY</span><small id="telemetryConnection">STANDBY</small></div><div class="metrics"><div><label>TEMPERATURE</label><strong id="telemetryTemp">NO DATA</strong></div><div><label>WIND</label><strong id="telemetryWind">NO DATA</strong></div><div><label>PRESSURE</label><strong id="telemetryPressure">NO DATA</strong></div><div><label>HUMIDITY</label><strong id="telemetryHumidity">NO DATA</strong></div></div><div class="risk-row"><span>ENVIRONMENTAL RISK</span><strong class="risk-label">NO DATA</strong></div><div class="telemetry-source"><span id="telemetrySource">Awaiting telemetry</span><span id="telemetryTime">—</span></div></section><section class="panel detail-panel"><div class="panel-head"><span>SELECTED MODULE</span><small id="moduleLabel">GROUND STATION</small></div><div class="module-frame-wrap"><iframe id="moduleFrame" title="Operational module" src="legacy-operations.html?module=ground"></iframe></div></section></aside>
+<nav class="subsystem-bar"><button class="subsystem active" data-module="ground"><span>01</span>GROUND STATION</button><button class="subsystem" data-module="meteorology"><span>02</span>METEOROLOGY</button><button class="subsystem" data-module="compliance"><span>03</span>COMPLIANCE</button><button class="subsystem" data-module="well-being"><span>04</span>WELL-BEING</button><button class="subsystem" data-module="infrastructure"><span>05</span>INFRASTRUCTURE</button></nav>
 </div>
-<script src="js/telemetry.js"></script>
-<script src="js/digital-twin.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+<script src="js/telemetry.js"></script><script src="js/digital-twin.js"></script><script src="script.js?v=polaris-ice-2"></script>
+</body></html>
