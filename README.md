@@ -1,19 +1,48 @@
 # POLARIS Digital Twin Test
 
-Isolated integration sandbox for the POLARIS Antarctica digital twin.
+Isolated integration sandbox for the POLARIS Antarctic station operations console.
 
-## Purpose
-- Preserve the production `kalki26060` repository untouched.
-- Test the Blender/Three.js digital twin integration.
-- Prepare the frontend/backend structure for live telemetry and risk visualization.
+## What is wired now
 
-## Planned architecture
-- Vercel/static frontend
-- Three.js + GLB Antarctica model
-- FastAPI telemetry gateway
-- MQTT simulator now; physical sensors later
-- Server-side risk engine
-- WebSocket live updates
+- Five operational modules in the test console.
+- FastAPI telemetry gateway at `/api/telemetry`.
+- WebSocket live feed at `/ws` with browser HTTP fallback.
+- MQTT subscriber feeding a transparent prototype risk engine.
+- Local MQTT simulator for sensor-style data.
+- Environment template with no real secrets.
+
+```text
+Sensors / simulator -> MQTT -> FastAPI -> risk engine -> WebSocket/HTTP -> browser digital twin
+```
+
+## Run locally
+
+PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r backend\requirements.txt
+$env:PYTHONPATH="$PWD\backend"
+uvicorn backend.main:app --reload
+```
+
+Open `http://127.0.0.1:8000/`.
+
+To test without physical sensors, start a local MQTT broker and run:
+
+```powershell
+python backend\simulator.py
+```
+
+Example topic: `antarctica/maitri/telemetry`.
+
+## Blender / GLB
+
+The provided `landscape.blend` is intentionally excluded from Git because it is roughly 200 MB and is an authoring file. Export an optimized `.glb` and place it in `assets/models/` for the next integration step.
 
 ## Secrets
-Never commit `.env` files, Supabase secret/service-role keys, MQTT passwords, or API tokens.
+
+Never commit `.env`, MQTT passwords, Supabase secret/service-role keys, or API tokens. `.env.example` is the safe template.
+
+Production `kalki26060` is not modified by this branch.
