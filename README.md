@@ -35,6 +35,23 @@ To test without physical sensors, start a local MQTT broker and run:
 python backend\simulator.py
 ```
 
+## Railway deployment
+
+The repository includes a production container that runs Mosquitto, the FastAPI
+gateway, and the Maitri ingestor together. In Railway, create a service from
+this repository and set the public domain for port `8000`. The health check is
+`/api/health`.
+
+Optional variables:
+
+```text
+MAITRI_POLL_SECONDS=60
+MAITRI_URL=https://data.ncpor.res.in/maitri/live
+MQTT_TOPIC=antarctica/maitri/telemetry
+```
+
+The service exposes the website, `/api/telemetry`, and `/ws` from the same URL.
+
 Example topic: `antarctica/maitri/telemetry`.
 
 ## Blender / GLB
