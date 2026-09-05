@@ -1,33 +1,13 @@
-const moduleNames={ground:'GROUND STATION',meteorology:'METEOROLOGY',compliance:'COMPLIANCE', 'well-being':'WELL-BEING',infrastructure:'INFRASTRUCTURE'};
-
-function updateClock(){
-  const el=document.querySelector('#clock');
-  if(el) el.textContent=new Date().toISOString().slice(11,19)+' UTC';
-}
-setInterval(updateClock,1000); updateClock();
-
-document.querySelectorAll('.module').forEach(button=>button.addEventListener('click',()=>{
-  document.querySelectorAll('.module').forEach(item=>item.classList.remove('active'));
-  button.classList.add('active');
-  const key=button.dataset.module;
-  const label=document.querySelector('#moduleLabel');
-  const frame=document.querySelector('#moduleFrame');
-  if(label) label.textContent=moduleNames[key]||key.toUpperCase();
-  if(frame) frame.src=`legacy-operations.html?module=${encodeURIComponent(key)}`;
-}));
-
-async function checkBackend(){
-  const state=document.querySelector('#backendState');
-  const source=document.querySelector('#backendSource');
-  try{
-    const response=await fetch('/api/health',{cache:'no-store'});
-    if(!response.ok) throw new Error('HTTP '+response.status);
-    const payload=await response.json();
-    if(state) state.textContent=payload.mqtt_connected?'MQTT CONNECTED':'API ONLINE / MQTT WAITING';
-    if(source) source.textContent=payload.latest?.source||'Telemetry gateway';
-  }catch(error){
-    if(state) state.textContent='BACKEND OFFLINE';
-    if(source) source.textContent='Run FastAPI from the project root';
-  }
-}
-checkBackend(); setInterval(checkBackend,5000);
+const moduleNames={ground:'GROUND STATION',meteorology:'METEOROLOGY',compliance:'COMPLIANCE','well-being':'WELL-BEING',infrastructure:'INFRASTRUCTURE'};
+function updateClock(){const el=document.querySelector('#utcClock');if(el)el.textContent=new Date().toISOString().slice(11,19)+' UTC'}
+updateClock();setInterval(updateClock,1000);
+function selectModule(key){document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module===key));const label=document.querySelector('#moduleLabel'),frame=document.querySelector('#moduleFrame');if(label)label.textContent=moduleNames[key]||key.toUpperCase();if(frame)frame.src=`legacy-operations.html?module=${encodeURIComponent(key)}`}
+document.querySelectorAll('.module,.subsystem').forEach(b=>b.addEventListener('click',()=>selectModule(b.dataset.module)));
+document.querySelectorAll('.timeline-item').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.timeline-item').forEach(x=>x.classList.remove('active'));b.classList.add('active');const asset=b.dataset.focus;document.querySelectorAll('.asset-group').forEach(x=>x.classList.toggle('selected',x.dataset.asset===asset));}));
+document.querySelectorAll('.asset-group').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.asset-group').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')}));
+const stage=document.querySelector('#mapStage');let zoom=1;
+document.querySelectorAll('.layer-btn').forEach(btn=>btn.addEventListener('click',()=>{btn.classList.toggle('active');const layer=btn.dataset.layer;if(layer==='satellites')stage?.classList.toggle('satellites-on',btn.classList.contains('active'));if(layer==='wind')document.querySelectorAll('.wind-stream').forEach(x=>x.style.display=btn.classList.contains('active')?'block':'none');if(layer==='risk')document.querySelectorAll('.risk-zone').forEach(x=>x.style.opacity=btn.classList.contains('active')?'0.9':'0.35')}));
+document.querySelectorAll('.icon-btn').forEach(btn=>btn.addEventListener('click',()=>{const action=btn.dataset.action;if(action==='zoom-in')zoom=Math.min(1.35,zoom+.1);if(action==='zoom-out')zoom=Math.max(.8,zoom-.1);if(action==='reset')zoom=1;if(stage)stage.style.transform=`scale(${zoom})`;const r=document.querySelector('#sceneZoomReadout');if(r)r.textContent=`ZOOM ${Math.round(zoom*100)}%`}));
+async function checkBackend(){const mode=document.querySelector('#backendMode');try{const r=await fetch('/api/health',{cache:'no-store'});if(!r.ok)throw new Error();const p=await r.json();if(mode)mode.textContent=p.mqtt_connected?'LIVE MQTT':'API ONLINE / MQTT WAITING'}catch(e){if(mode)mode.textContent='DEMO MODE'}}
+checkBackend();setInterval(checkBackend,5000);
+window.addEventListener('load',()=>selectModule('ground'));
