@@ -20,6 +20,7 @@
   const q = s => document.querySelector(s);
   const qa = s => [...document.querySelectorAll(s)];
   const stage = q('#mapStage');
+  const mapWrapper = q('#mapWrapper');
   const svg = q('#digitalTwin');
   const drawer = q('#assetDrawer');
   const modal = q('#detailModal');
@@ -42,7 +43,11 @@
   function focusAsset(key){
     const el=q(`.asset-group[data-asset="${key}"]`); if(!el||!svg) return;
     const b=el.getBBox(), vb=svg.viewBox.baseVal;
-    state.panX=vb.width/2-(b.x+b.width/2); state.panY=vb.height/2-(b.y+b.height/2); state.zoom=Math.max(state.zoom,1.2); updateTransform();
+    const scale=(svg.clientWidth || mapWrapper?.clientWidth || vb.width)/vb.width;
+    state.zoom=Math.max(state.zoom,1.2);
+    state.panX=(mapWrapper?.clientWidth || svg.clientWidth)/2-(b.x+b.width/2)*scale*state.zoom;
+    state.panY=(mapWrapper?.clientHeight || svg.clientHeight)/2-(b.y+b.height/2)*scale*state.zoom;
+    updateTransform();
   }
   function updateTransform(){
     if(stage) stage.style.transform=`translate3d(${state.panX}px,${state.panY}px,0) scale(${state.zoom})`;
@@ -66,6 +71,9 @@
   function setLayer(layer){
     state.layers[layer]=!state.layers[layer];
     const btn=q(`[data-layer="${layer}"]`); if(btn) btn.classList.toggle('active',state.layers[layer]);
+    applyLayers();
+  }
+  function applyLayers(){
     qa('.layer-group').forEach(g=>{
       const names=(g.dataset.layers||'').split(/\s+/).filter(Boolean); if(names.length) g.style.display=names.some(n=>state.layers[n]===false)?'none':'';
     });
@@ -76,7 +84,7 @@
   }
 
   qa('.asset-group').forEach(el=>{
-    el.addEventListener('click',e=>{ e.stopPropagation(); selectAsset(el.dataset.asset,false); });
+    el.addEventListener('click',e=>{ e.stopPropagation(); if(state.dragMoved) return; selectAsset(el.dataset.asset,false); });
     el.addEventListener('mouseenter',e=>showTip(e,el.dataset.asset)); el.addEventListener('mousemove',e=>showTip(e,el.dataset.asset)); el.addEventListener('mouseleave',hideTip);
   });
   function showTip(e,key){ const t=q('#assetTooltip'); if(!t||!stage)return; const a=assetData[key]; const r=stage.getBoundingClientRect(); t.style.left=Math.min(Math.max(e.clientX-r.left+14,12),r.width-190)+'px'; t.style.top=Math.min(Math.max(e.clientY-r.top+14,12),r.height-70)+'px'; t.innerHTML=`<strong>${a[0]}</strong><span>${a[1]}</span>`; t.classList.add('show'); }
@@ -89,12 +97,14 @@
   qa('.subsystem').forEach(b=>b.addEventListener('click',()=>openModule(b.dataset.view)));
   q('#openDetailedButton')?.addEventListener('click',()=>openModule(state.selected==='weather'?'meteorology':'ground-station'));
   q('#closeDetail')?.addEventListener('click',closeModule); q('#detailBackdrop')?.addEventListener('click',closeModule); q('#closeDrawer')?.addEventListener('click',()=>drawer?.classList.add('collapsed')); q('#addObservationButton')?.addEventListener('click',addObservation);
-  stage?.addEventListener('pointerdown',e=>{state.dragging=true;state.startX=e.clientX;state.startY=e.clientY;state.startPanX=state.panX;state.startPanY=state.panY;stage.classList.add('dragging');});
-  window.addEventListener('pointermove',e=>{if(!state.dragging)return;state.panX=state.startPanX+e.clientX-state.startX;state.panY=state.startPanY+e.clientY-state.startY;updateTransform();});
+  stage?.addEventListener('pointerdown',e=>{state.dragging=true;state.dragMoved=false;state.startX=e.clientX;state.startY=e.clientY;state.startPanX=state.panX;state.startPanY=state.panY;stage.setPointerCapture?.(e.pointerId);stage.classList.add('dragging');});
+  window.addEventListener('pointermove',e=>{if(!state.dragging)return;const dx=e.clientX-state.startX,dy=e.clientY-state.startY;state.dragMoved=state.dragMoved||Math.hypot(dx,dy)>4;state.panX=state.startPanX+dx;state.panY=state.startPanY+dy;updateTransform();});
   window.addEventListener('pointerup',()=>{state.dragging=false;stage?.classList.remove('dragging');});
+  window.addEventListener('pointercancel',()=>{state.dragging=false;stage?.classList.remove('dragging');});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModule();if(e.key==='0'){state.zoom=1;state.panX=0;state.panY=0;updateTransform();}});
   function updateClock(){setText('#utcClock',new Date().toISOString().slice(11,19)+' UTC');} updateClock();setInterval(updateClock,1000);
   async function checkBackend(){try{const r=await fetch('/api/health',{cache:'no-store'});if(!r.ok)throw 0;const p=await r.json();setText('#backendMode',p.mqtt_connected?'LIVE MQTT':'API ONLINE / MQTT WAITING');}catch{setText('#backendMode','DEMO MODE');}}
   checkBackend(); setInterval(checkBackend,5000);
-  selectAsset('main-station'); updateTransform();
+  qa('.layer-btn').forEach(b=>b.classList.toggle('active',state.layers[b.dataset.layer]));
+  applyLayers(); selectAsset('main-station'); updateTransform();
 })();
