@@ -1,0 +1,9 @@
+{
+  "name": "polaris-digital-twin-test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "python -m uvicorn backend.main:app --reload",
+    "start": "python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000"
+  }
+}
