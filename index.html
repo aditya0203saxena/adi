@@ -1,141 +1,179 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>POLARIS OPS — Antarctic Digital Twin</title>
-<meta name="description" content="POLARIS Antarctic research station digital twin and operations console.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=polaris-ice-3">
-<style>
-/* 2.5D DIGITAL TWIN */
-.map-wrapper{position:relative;min-height:0;overflow:hidden}
-#digitalTwin{display:block;width:100%;height:100%;min-height:520px;background:linear-gradient(180deg,#f9fcfd 0%,#e4f0f3 100%);cursor:grab}
-#digitalTwin:active{cursor:grabbing}
-#digitalTwin .asset-group{cursor:pointer;transition:opacity .2s,filter .2s}
-#digitalTwin .asset-group:hover{filter:brightness(1.04) drop-shadow(0 7px 8px rgba(44,83,99,.16))}
-#digitalTwin .asset-group.selected{filter:brightness(1.03) drop-shadow(0 8px 10px rgba(0,143,156,.2))}
-#digitalTwin .label{font:700 13px "IBM Plex Mono",monospace;letter-spacing:.12em;fill:#315967}
-#digitalTwin .micro{font:600 9px "IBM Plex Mono",monospace;letter-spacing:.12em;fill:#6f858e}
-#digitalTwin .edge{stroke:#668794;stroke-opacity:.38;stroke-width:2}
-#digitalTwin .snow{fill:#f9fcfd;stroke:#9eb9c2;stroke-opacity:.55}
-#digitalTwin .glass{fill:#8ecbd0;fill-opacity:.24;stroke:#258a99;stroke-opacity:.55;stroke-width:2}
-#digitalTwin .metal{fill:#dfeaec;stroke:#537783;stroke-opacity:.5;stroke-width:2}
-#digitalTwin .darkmetal{fill:#b9ccd2;stroke:#476873;stroke-opacity:.65;stroke-width:2}
-#digitalTwin .aqua{stroke:#008f9c;fill:#008f9c}
-#digitalTwin .amber{stroke:#d7972d;fill:#d7972d}
-#digitalTwin .purple{stroke:#7c61a8;fill:#7c61a8}
-#digitalTwin .blue{stroke:#3c8dcc;fill:#3c8dcc}
-#digitalTwin .windline{stroke:#008f9c;stroke-opacity:.33;stroke-width:3;fill:none;stroke-dasharray:10 13}
-#digitalTwin .orbitline{fill:none;stroke:#3c8dcc;stroke-opacity:.2;stroke-width:2}
-#digitalTwin .linkline{fill:none;stroke:#008f9c;stroke-opacity:.42;stroke-width:2;stroke-dasharray:7 9}
-#digitalTwin .riskfill{fill:#d65d5d;fill-opacity:.08;stroke:#d65d5d;stroke-opacity:.38;stroke-width:2}
-.twin-title{position:absolute;left:16px;top:14px;z-index:3;font:600 10px "IBM Plex Mono",monospace;letter-spacing:.14em;color:#607985;pointer-events:none}
-.twin-mode{position:absolute;right:16px;top:14px;z-index:3;font:600 9px "IBM Plex Mono",monospace;letter-spacing:.12em;color:#6b838d;pointer-events:none}
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POLARIS OPS — Antarctic Digital Twin</title>
+    <meta
+      name="description"
+      content="Antarctic research station digital twin with live-style instrumentation, mission control layers, and operational asset monitoring."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css?v=ui-refine-1" />
+  </head>
+  <body>
 <div class="app-shell">
-<header class="global-header"><div class="brand-lockup"><div class="brand-mark">P</div><div><div class="brand-title">POLARIS OPS</div><div class="brand-subtitle">ANTARCTIC DIGITAL TWIN // DT-01</div></div></div><div class="header-center"><span class="live-dot"></span><span>MAITRI RESEARCH STATION</span><span class="header-sep">//</span><span>70.76° S, 11.74° E</span></div><div class="header-meta"><span id="backendMode">DEMO MODE</span><strong id="utcClock">--:--:-- UTC</strong></div></header>
-<section class="operation-timeline"><div class="timeline-label">OPERATION TIMELINE</div><div class="timeline-track"><button class="timeline-item active" data-focus="communications"><span>08:30</span><b>SATELLITE PASS</b></button><button class="timeline-item" data-focus="weather"><span>09:10</span><b>WEATHER OBSERVATION</b></button><button class="timeline-item" data-focus="power"><span>10:20</span><b>MAINTENANCE</b></button><button class="timeline-item" data-focus="runway"><span>11:45</span><b>FIELD OBSERVATION</b></button><button class="timeline-item" data-focus="heritage"><span>12:30</span><b>COMPLIANCE EVENT</b></button></div></section>
-<aside class="station-compartments"><div class="compartment-head"><span>STATION</span><strong>COMPARTMENTS</strong></div><button class="module compartment active" data-module="ground"><i class="c-building"></i><span><b>GROUND STATION</b><small>Satellite / DRS / RF</small></span></button><button class="module compartment" data-module="meteorology"><i class="c-weather"></i><span><b>METEOROLOGY</b><small>Wind / pressure / atmosphere</small></span></button><button class="module compartment" data-module="compliance"><i class="c-heritage"></i><span><b>COMPLIANCE</b><small>Permits / EIA / biosecurity</small></span></button><button class="module compartment" data-module="well-being"><i class="c-well"></i><span><b>WELL-BEING</b><small>Anonymous crew check-ins</small></span></button><button class="module compartment" data-module="infrastructure"><i class="c-access"></i><span><b>INFRASTRUCTURE</b><small>Assets / heritage / access</small></span></button><div class="compartment-legend"><span><i class="legend-dot building"></i>Infrastructure</span><span><i class="legend-dot comms"></i>Comms</span><span><i class="legend-dot power"></i>Energy</span><span><i class="legend-dot weather"></i>Science</span></div></aside>
-<main class="center-panel"><header class="topbar"><div class="topbar-row"><div><div class="eyebrow">POLAR RESEARCH COMPLEX // MAITRI</div><h1>LIVE DIGITAL TWIN</h1></div><div class="toolbar"><button class="icon-btn" data-action="zoom-in">+</button><button class="icon-btn" data-action="zoom-out">−</button><button class="icon-btn" data-action="reset">RESET</button></div></div><div class="layer-controls"><button class="layer-btn active" data-layer="infrastructure">INFRASTRUCTURE</button><button class="layer-btn active" data-layer="weather">WEATHER</button><button class="layer-btn active" data-layer="wind">WIND</button><button class="layer-btn active" data-layer="satellites">SATELLITES</button><button class="layer-btn" data-layer="risk">RISK</button></div></header>
-<section class="map-wrapper" id="mapWrapper" aria-label="Maitri station 2.5D digital twin"><div class="twin-title">SCENE // DT-01 // STATION MODEL</div><div class="twin-mode">INTERACTIVE 2.5D</div>
-<svg id="digitalTwin" viewBox="0 0 1100 760" role="img" aria-labelledby="svgTitle svgDesc">
-<title id="svgTitle">Maitri Antarctic station 2.5D digital twin</title><desc id="svgDesc">Interactive isometric-style research station model with buildings, runway, weather, power, communications, satellite links and operational risk zones.</desc>
-<defs>
- <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dbeaed"/></linearGradient>
- <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfe1e6"/></linearGradient>
- <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9e8ec"/><stop offset="1" stop-color="#aec7ce"/></linearGradient>
- <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#496d78" flood-opacity=".16"/></filter>
- <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#4f7380" stroke-opacity=".06"/></pattern>
-</defs>
-<rect width="1100" height="760" fill="url(#grid)"/>
-<path d="M72 590 Q180 520 330 556 T640 545 T1015 575 L1030 680 Q840 646 650 676 T280 662 Q140 650 72 590Z" fill="url(#ice)" stroke="#9fb8c1" stroke-opacity=".5"/>
-<path d="M110 188 Q270 96 440 142 T768 124 T1010 205" class="windline"/>
-<path d="M88 238 Q258 154 418 202 T760 186 T1012 264" class="windline"/>
-<g class="layer-group" data-layer-name="satellites">
- <ellipse cx="555" cy="380" rx="250" ry="155" class="orbitline"/><ellipse cx="555" cy="380" rx="340" ry="215" class="orbitline"/>
- <path d="M120 530 Q320 220 620 350 T1010 220" class="linkline"/>
- <g class="asset-group" data-asset="satellite-a"><rect x="812" y="170" width="26" height="16" rx="3" class="metal"/><path d="M812 178h-20m46 0h20M825 170v-12m0 28v12" stroke="#3c8dcc" stroke-width="2"/><circle cx="825" cy="178" r="4" fill="#3c8dcc"/><text x="846" y="176" class="label">SAT-A</text></g>
- <g class="asset-group" data-asset="satellite-b"><rect x="510" y="132" width="26" height="16" rx="3" class="metal"/><path d="M510 140h-20m46 0h20M523 132v-12m0 28v12" stroke="#3c8dcc" stroke-width="2"/><circle cx="523" cy="140" r="4" fill="#3c8dcc"/><text x="544" y="138" class="label">SAT-B</text></g>
-</g>
-<g class="layer-group" data-layer-name="risk">
- <path d="M248 300 L470 250 L625 310 L430 405 L235 370Z" class="riskfill"/><path d="M682 300 L862 270 L925 338 L765 397 L634 350Z" class="riskfill"/>
- <text x="295" y="322" class="label" fill="#b44b4b">RISK ZONE</text><text x="722" y="326" class="label" fill="#b44b4b">RISK ZONE</text>
-</g>
-<!-- runway -->
-<g class="asset-group" data-asset="runway">
- <path d="M75 600 L520 548 L1042 576 L1015 635 L560 612 L110 654Z" fill="#f1f5f6" stroke="#8099a2" stroke-opacity=".5" stroke-width="2" filter="url(#shadow)"/>
- <path d="M150 617 L563 574 L962 594" fill="none" stroke="#c89b2d" stroke-opacity=".75" stroke-width="4" stroke-dasharray="18 18"/>
- <text x="835" y="570" class="label">RUNWAY / ACCESS</text>
-</g>
-<!-- power -->
-<g class="asset-group" data-asset="power" filter="url(#shadow)">
- <path d="M140 548 L240 510 L340 535 L240 574Z" class="roof" fill="url(#roof)"/>
- <path d="M140 548 L240 574 L240 635 L140 604Z" fill="url(#wall)" class="edge"/>
- <path d="M240 574 L340 535 L340 593 L240 635Z" fill="#9fb7be" class="edge"/>
- <rect x="184" y="555" width="22" height="42" rx="3" fill="#e69a2e" fill-opacity=".62"/><rect x="215" y="545" width="22" height="42" rx="3" fill="#e69a2e" fill-opacity=".38"/>
- <text x="146" y="666" class="label">POWER / ENERGY</text>
-</g>
-<!-- weather -->
-<g class="asset-group" data-asset="weather">
- <path d="M550 200 L580 183 L610 200 L600 258 L560 258Z" class="glass"/>
- <path d="M575 180 V122 M575 140 L616 140 M575 148 L536 128" stroke="#3c8dcc" stroke-width="3"/><path d="M616 140 l-11 -7 l4 12" fill="#3c8dcc"/>
- <circle cx="575" cy="122" r="7" fill="#3c8dcc"/><text x="538" y="282" class="label">MET / WEATHER</text>
-</g>
-<!-- communications dish -->
-<g class="asset-group" data-asset="communications" filter="url(#shadow)">
- <ellipse cx="185" cy="360" rx="64" ry="22" transform="rotate(-23 185 360)" fill="#d7e6ea" stroke="#4d727d" stroke-width="2"/>
- <path d="M185 360 L246 286" stroke="#536f78" stroke-width="7"/><circle cx="185" cy="360" r="8" fill="#008f9c"/>
- <path d="M127 388 Q185 328 243 350" fill="none" stroke="#008f9c" stroke-opacity=".75" stroke-width="3"/>
- <text x="122" y="414" class="label">RF / COMMS</text>
-</g>
-<!-- heritage -->
-<g class="asset-group" data-asset="heritage">
- <path d="M760 348 L790 320 L820 348 L815 410 L765 410Z" fill="#e8e0f1" stroke="#7c61a8" stroke-opacity=".65" stroke-width="2"/><path d="M755 350 L790 314 L825 350" fill="#d5c7e5" stroke="#7c61a8" stroke-opacity=".65" stroke-width="2"/>
- <circle cx="790" cy="375" r="7" fill="#7c61a8"/><text x="742" y="435" class="label">HERITAGE</text>
-</g>
-<!-- main station 2.5D massing -->
-<g class="asset-group selected" data-asset="main-station" filter="url(#shadow)">
- <path d="M350 420 L635 420 L735 463 L448 466Z" fill="url(#roof)" stroke="#668794" stroke-opacity=".45" stroke-width="2"/>
- <path d="M350 420 L448 466 L448 560 L350 514Z" fill="url(#wall)" stroke="#668794" stroke-opacity=".45" stroke-width="2"/>
- <path d="M448 466 L735 463 L735 552 L448 560Z" fill="#b3c9ce" stroke="#668794" stroke-opacity=".45" stroke-width="2"/>
- <path d="M382 400 L505 348 L661 367 L735 410 L635 454 L448 451Z" fill="#fafdfe" stroke="#6f8d96" stroke-opacity=".5" stroke-width="2"/>
- <path d="M382 400 L505 348 L661 367 L635 386 L510 375 L410 418Z" fill="#ffffff"/>
- <path d="M505 348 L570 318 L662 336 L661 367Z" fill="#dbeaed" stroke="#6f8d96" stroke-opacity=".5" stroke-width="2"/>
- <path d="M398 433 L438 451 L438 505 L398 486Z" class="glass"/><path d="M475 464 L536 463 L536 535 L475 536Z" fill="#8fb8c1" fill-opacity=".27" stroke="#2e7e8b" stroke-opacity=".38" stroke-width="2"/><path d="M558 463 L620 462 L620 530 L558 531Z" class="glass"/>
- <rect x="650" y="405" width="38" height="14" rx="3" fill="#008f9c" fill-opacity=".8"/>
- <circle cx="570" cy="386" r="8" fill="#58cfc5" stroke="#008f9c" stroke-width="3"/>
- <text x="488" y="404" class="label">MAITRI STATION CORE</text><text x="500" y="425" class="micro">RESEARCH / COMMAND / LIFE SUPPORT</text>
-</g>
-<!-- lab annex -->
-<g class="asset-group" data-asset="laboratory">
- <path d="M300 432 L365 405 L424 426 L362 455Z" fill="#f5fafb" stroke="#668794" stroke-opacity=".4" stroke-width="2"/><path d="M300 432 L362 455 L362 510 L300 486Z" fill="#b9cdd3" stroke="#668794" stroke-opacity=".4" stroke-width="2"/><path d="M362 455 L424 426 L424 480 L362 510Z" fill="#a8c1c8" stroke="#668794" stroke-opacity=".4" stroke-width="2"/><rect x="323" y="444" width="28" height="31" class="glass"/><text x="283" y="535" class="label">LAB MODULE</text>
-</g>
-<!-- access route -->
-<g class="asset-group" data-asset="access-route"><path d="M120 520 C220 575 290 565 350 516 S430 486 500 474" fill="none" stroke="#c89b2d" stroke-opacity=".62" stroke-width="6" stroke-dasharray="13 14"/><circle cx="500" cy="474" r="7" fill="#c89b2d"/><text x="122" y="505" class="micro">FIELD ACCESS ROUTE</text></g>
-<!-- labels and north -->
-<g transform="translate(972 92)"><circle cx="0" cy="0" r="26" fill="#fff" fill-opacity=".8" stroke="#7e969f" stroke-opacity=".35"/><path d="M0 -16 L6 6 L0 2 L-6 6Z" fill="#008f9c"/><text x="-5" y="-33" class="label">N</text></g>
-<g transform="translate(70 100)"><rect width="205" height="62" rx="10" fill="#fff" fill-opacity=".78" stroke="#8aa2ab" stroke-opacity=".25"/><text x="16" y="22" class="label">MAITRI // DT-01</text><text x="16" y="42" class="micro">INTERACTIVE STATION MODEL</text></g>
-</svg>
-<div class="scene-hud"><span>SCENE // DT-01</span><span id="sceneZoomReadout">ZOOM 100%</span></div>
-</section></main>
-<aside class="right-panel"><section class="panel telemetry-panel"><div class="panel-head"><span>LIVE TELEMETRY</span><small id="telemetryConnection">STANDBY</small></div><div class="metrics"><div><label>TEMPERATURE</label><strong id="telemetryTemp">NO DATA</strong></div><div><label>WIND</label><strong id="telemetryWind">NO DATA</strong></div><div><label>PRESSURE</label><strong id="telemetryPressure">NO DATA</strong></div><div><label>HUMIDITY</label><strong id="telemetryHumidity">NO DATA</strong></div></div><div class="risk-row"><span>ENVIRONMENTAL RISK</span><strong class="risk-label">NO DATA</strong></div><div class="telemetry-source"><span id="telemetrySource">Awaiting telemetry</span><span id="telemetryTime">—</span></div></section><section class="panel detail-panel"><div class="panel-head"><span>SELECTED MODULE</span><small id="moduleLabel">GROUND STATION</small></div><div class="module-frame-wrap"><iframe id="moduleFrame" title="Operational module" src="legacy-operations.html?module=ground"></iframe></div></section></aside>
-<nav class="subsystem-bar"><button class="subsystem active" data-module="ground"><span>01</span>GROUND STATION</button><button class="subsystem" data-module="meteorology"><span>02</span>METEOROLOGY</button><button class="subsystem" data-module="compliance"><span>03</span>COMPLIANCE</button><button class="subsystem" data-module="well-being"><span>04</span>WELL-BEING</button><button class="subsystem" data-module="infrastructure"><span>05</span>INFRASTRUCTURE</button></nav>
+  <header class="global-header">
+    <div class="brand-lockup">
+      <div class="brand-mark">P</div>
+      <div><div class="brand-title">POLARIS OPS</div><div class="brand-subtitle">ANTARCTIC DIGITAL TWIN // DT-01</div></div>
+    </div>
+    <div class="header-center"><span class="live-dot"></span><span>RESEARCH STATION</span><span class="header-sep">//</span><span>77.857° S, 166.730° E</span></div>
+    <div class="header-meta"><span id="backendMode">DEMO MODE</span><strong id="utcClock">--:--:-- UTC</strong></div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-kicker">STATION SYSTEMS</div>
+    <button class="nav-item active" data-view="ground-station"><span class="nav-num">01</span><span><b>GROUND STATION</b><small>Satellite / DRS / RF</small></span></button>
+    <button class="nav-item" data-view="meteorology"><span class="nav-num">02</span><span><b>METEOROLOGY</b><small>Wind / pressure / atmosphere</small></span></button>
+    <button class="nav-item" data-view="compliance"><span class="nav-num">03</span><span><b>COMPLIANCE</b><small>Permits / EIA / biosecurity</small></span></button>
+    <button class="nav-item" data-view="well-being"><span class="nav-num">04</span><span><b>WELL-BEING</b><small>Anonymous crew check-ins</small></span></button>
+    <button class="nav-item" data-view="infrastructure"><span class="nav-num">05</span><span><b>INFRASTRUCTURE</b><small>Assets / heritage / access</small></span></button>
+    <div class="sidebar-foot"><span>ENVIRONMENT</span><strong>ANTARCTIC OPERATIONS</strong><small>Digital-twin demonstrator // non-safety-critical</small></div>
+  </aside>
+
+  <main class="center-panel">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div><div class="eyebrow">POLAR RESEARCH COMPLEX // MAITRI</div><h1>LIVE DIGITAL TWIN</h1></div>
+        <div class="toolbar"><button class="icon-btn" data-action="zoom-in">+</button><button class="icon-btn" data-action="zoom-out">−</button><button class="icon-btn" data-action="reset">RESET</button></div>
+      </div>
+      <div class="layer-controls">
+        <button class="layer-btn active" data-layer="infrastructure">INFRASTRUCTURE</button>
+        <button class="layer-btn" data-layer="satellites">SATELLITES</button>
+        <button class="layer-btn active" data-layer="weather">WEATHER</button>
+        <button class="layer-btn active" data-layer="wind">WIND</button>
+        <button class="layer-btn" data-layer="lidar">LIDAR</button>
+        <button class="layer-btn active" data-layer="access">ACCESS</button>
+        <button class="layer-btn active" data-layer="heritage">HERITAGE</button>
+        <button class="layer-btn" data-layer="risk">RISK</button>
+      </div>
+    </header>
+
+    <div class="map-wrapper" id="mapWrapper" aria-label="Antarctic station digital twin viewport">
+      <div class="map-stage" id="mapStage">
+        <svg id="digitalTwin" viewBox="0 0 1100 760" role="img" aria-labelledby="svgTitle svgDesc">
+          <title id="svgTitle">Antarctic research station digital twin</title>
+          <desc id="svgDesc">Stylized 2.5D model of an Antarctic scientific station with infrastructure, access routes, weather systems, and orbital linkages.</desc>
+          <defs>
+            <linearGradient id="iceGround" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#dfeff7" stop-opacity="0.82"/><stop offset="52%" stop-color="#adc9d8" stop-opacity="0.72"/><stop offset="100%" stop-color="#7fa7ba" stop-opacity="0.78"/></linearGradient>
+            <linearGradient id="iceShadow" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#93b3c6" stop-opacity="0.6"/><stop offset="100%" stop-color="#688ea1" stop-opacity="0.82"/></linearGradient>
+            <linearGradient id="stationBody" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stop-color="#1a2f43"/><stop offset="100%" stop-color="#0d1d2a"/></linearGradient>
+            <linearGradient id="aquaGlow" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" stop-color="#7ae8dc" stop-opacity="0.9"/><stop offset="100%" stop-color="#6fb7ff" stop-opacity="0.9"/></linearGradient>
+            <linearGradient id="amberGlow" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" stop-color="#ffc56b" stop-opacity="0.9"/><stop offset="100%" stop-color="#ff8f5e" stop-opacity="0.9"/></linearGradient>
+          </defs>
+          <g id="digitalTwinInner">
+            <g class="terrain-base">
+              <path d="M60 620 C220 530, 300 540, 440 525 L620 560 C770 590, 860 575, 1038 536 L1038 760 L60 760 Z" fill="url(#iceGround)" opacity="0.96" />
+              <path d="M170 670 C310 615, 420 610, 560 630 C700 648, 790 630, 960 600 L1010 760 L170 760 Z" fill="url(#iceShadow)" opacity="0.64" />
+            </g>
+
+            <g class="layer-group" data-layers="weather wind">
+              <g class="weather-layer">
+                <path d="M125 160 C260 110 355 130 480 175 S760 220 960 155" fill="none" stroke="#6fb7ff" stroke-opacity=".18" stroke-width="8"/>
+                <path d="M120 190 C280 144 350 168 490 208 S780 245 980 185" class="windline"/>
+                <g class="asset-group" data-asset="weather"><rect x="512" y="282" width="132" height="74" rx="10" fill="#0e2333" stroke="#7ae8dc" stroke-opacity=".7" stroke-width="2"/><path d="M548 334h61" stroke="#6fb7ff" stroke-width="3" stroke-linecap="round"/><circle cx="535" cy="315" r="5" fill="#6fb7ff"/><text x="528" y="305" class="label">METEO</text><text x="526" y="351" class="micro">TEMP / WIND / RH</text></g>
+              </g>
+            </g>
+
+            <g class="layer-group" data-layers="satellites">
+              <ellipse cx="560" cy="350" rx="300" ry="145" class="orbitline"/>
+              <ellipse cx="560" cy="350" rx="405" ry="195" class="orbitline"/>
+              <g class="asset-group satellite-node" data-asset="satellite-a"><circle cx="865" cy="153" r="11" fill="#6fb7ff"/><path d="M850 153h-25m51 0h25M865 138v-19m0 49v18" stroke="#6fb7ff" stroke-width="2"/><text x="884" y="146" class="label">SAT-A</text></g>
+              <g class="asset-group satellite-node" data-asset="satellite-b"><circle cx="270" cy="122" r="11" fill="#7ae8dc"/><path d="M255 122h-25m51 0h25M270 107V88m0 49v18" stroke="#7ae8dc" stroke-width="2"/><text x="288" y="115" class="label">SAT-B</text></g>
+              <path d="M270 122 Q390 210 505 300 T865 153" class="linkline"/>
+            </g>
+
+            <g class="layer-group" data-layers="risk">
+              <path d="M215 300 L455 265 L625 325 L425 410 L240 372Z" class="riskfill"/>
+              <path d="M670 300 L865 268 L935 332 L765 400 L628 349Z" class="riskfill"/>
+              <text x="288" y="327" class="risk-label">NO DATA</text>
+              <text x="708" y="318" class="risk-label risk-label-small">NO DATA</text>
+            </g>
+
+            <g class="asset-group" data-asset="runway">
+              <path d="M82 607 L520 546 L1043 574 L1015 635 L558 610 L110 651Z" fill="#eef4f6" fill-opacity=".9" stroke="#708f9c" stroke-opacity=".6" stroke-width="2"/>
+              <path d="M150 617 L565 573 L964 594" fill="none" stroke="#ffc56b" stroke-opacity=".9" stroke-width="4" stroke-dasharray="18 18"/>
+              <text x="845" y="568" class="label">RUNWAY / ACCESS</text>
+            </g>
+
+            <g class="asset-group" data-asset="power">
+              <path d="M135 536 L232 493 L345 524 L245 568Z" fill="#dfeaec" stroke="#668794" stroke-opacity=".6" stroke-width="2"/>
+              <path d="M135 536 L245 568 L245 630 L135 600Z" fill="#b8ced6" stroke="#668794" stroke-opacity=".55" stroke-width="2"/>
+              <path d="M245 568 L345 524 L345 591 L245 630Z" fill="#97b1bc" stroke="#668794" stroke-opacity=".55" stroke-width="2"/>
+              <rect x="185" y="549" width="22" height="46" rx="3" fill="#ffc56b" fill-opacity=".7"/><rect x="218" y="538" width="22" height="46" rx="3" fill="#ff9d4d" fill-opacity=".5"/>
+              <text x="140" y="659" class="label">POWER / ENERGY</text>
+            </g>
+
+            <g class="asset-group" data-asset="communications">
+              <ellipse cx="182" cy="360" rx="64" ry="22" transform="rotate(-23 182 360)" fill="#d7e6ea" stroke="#4d727d" stroke-width="2"/>
+              <path d="M182 360 L244 286" stroke="#536f78" stroke-width="7"/><circle cx="182" cy="360" r="8" fill="#7ae8dc"/>
+              <path d="M125 388 Q182 328 244 350" fill="none" stroke="#7ae8dc" stroke-opacity=".75" stroke-width="3"/>
+              <text x="122" y="414" class="label">RF / COMMS</text>
+            </g>
+
+            <g class="asset-group" data-asset="heritage">
+              <path d="M760 348 L790 320 L820 348 L815 410 L765 410Z" fill="#d9cde9" stroke="#7c61a8" stroke-opacity=".75" stroke-width="2"/><path d="M755 350 L790 314 L825 350" fill="#cbb9dd" stroke="#7c61a8" stroke-opacity=".75" stroke-width="2"/><circle cx="790" cy="375" r="7" fill="#7c61a8"/><text x="742" y="435" class="label">HERITAGE</text>
+            </g>
+
+            <g class="asset-group selected" data-asset="main-station">
+              <path d="M350 420 L635 420 L735 463 L448 466Z" fill="#eef5f7" stroke="#718e98" stroke-opacity=".65" stroke-width="2"/>
+              <path d="M350 420 L448 466 L448 560 L350 514Z" fill="#bccfd5" stroke="#718e98" stroke-opacity=".55" stroke-width="2"/>
+              <path d="M448 466 L735 463 L735 552 L448 560Z" fill="url(#stationBody)" stroke="#668794" stroke-opacity=".6" stroke-width="2"/>
+              <path d="M382 431 L548 432 L595 451 L430 452Z" fill="#7ae8dc" fill-opacity=".14" stroke="#7ae8dc" stroke-opacity=".3"/>
+              <rect x="485" y="482" width="38" height="42" rx="4" fill="#6fb7ff" fill-opacity=".25" stroke="#6fb7ff" stroke-opacity=".5"/>
+              <rect x="535" y="480" width="38" height="44" rx="4" fill="#6fb7ff" fill-opacity=".25" stroke="#6fb7ff" stroke-opacity=".5"/>
+              <rect x="585" y="480" width="38" height="44" rx="4" fill="#7ae8dc" fill-opacity=".16" stroke="#7ae8dc" stroke-opacity=".5"/>
+              <rect x="638" y="480" width="44" height="44" rx="4" fill="#ffc56b" fill-opacity=".14" stroke="#ffc56b" stroke-opacity=".5"/>
+              <text x="473" y="544" class="label" fill="#edf6fb">MAIN RESEARCH STATION</text>
+              <text x="494" y="561" class="micro" fill="#9bb4bf">LABS / CORE / WINTER-OVER</text>
+            </g>
+          </g>
+        </svg>
+        <div class="scene-hud" aria-hidden="true">
+          <div class="scene-corner scene-corner-tl"></div><div class="scene-corner scene-corner-tr"></div><div class="scene-corner scene-corner-bl"></div><div class="scene-corner scene-corner-br"></div><div class="scene-crosshair"></div>
+          <div class="scene-readout"><span>SCENE // DT-01</span><span id="sceneZoomReadout">ZOOM 100%</span></div>
+          <div class="scene-orientation">N</div><div class="scene-mode">DEMO DIGITAL TWIN</div>
+        </div>
+        <div id="assetTooltip" class="asset-tooltip" role="status" aria-hidden="true"></div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="subsystem-bar" aria-label="Operational modules">
+    <button class="subsystem active" data-view="ground-station"><span>01</span>GROUND STATION</button>
+    <button class="subsystem" data-view="meteorology"><span>02</span>METEOROLOGY</button>
+    <button class="subsystem" data-view="compliance"><span>03</span>COMPLIANCE</button>
+    <button class="subsystem" data-view="well-being"><span>04</span>WELL-BEING</button>
+    <button class="subsystem" data-view="infrastructure"><span>05</span>INFRASTRUCTURE</button>
+  </nav>
+
+  <aside class="asset-drawer" id="assetDrawer" aria-hidden="false">
+    <div class="drawer-head"><span class="drawer-kicker">SELECTED ASSET</span><button id="closeDrawer" aria-label="Close asset details">×</button></div>
+    <div class="drawer-title-row"><h2 id="asset-title">MAIN RESEARCH STATION</h2><span class="tag tag-neutral" id="asset-status-tag">DEMO / NO DATA</span></div>
+    <div class="drawer-grid"><div><small>STATUS</small><strong id="asset-status">DEMO / NO DATA</strong></div><div><small>RISK</small><strong id="asset-risk">DEMO WATCH</strong></div><div><small>OBSERVATION</small><strong id="asset-observation">DEMO TRACE</strong></div><div><small>LAST CHECK</small><strong id="asset-last-check">DEMO</strong></div></div>
+    <div class="drawer-section"><small>SUBSYSTEMS</small><ul id="asset-systems" class="asset-systems"></ul></div>
+    <div class="drawer-section"><small>OPERATING CONTEXT</small><p id="asset-context-note">Select a station component to inspect its operational context.</p></div>
+    <div class="drawer-source"><small>DATA SOURCE</small><p id="asset-source">Illustrative demo feed. Real telemetry is not connected.</p></div>
+    <div class="drawer-actions"><button class="primary-btn" id="openDetailedButton">OPEN DETAILED OPERATIONS</button><button class="secondary-btn" id="addObservationButton">ADD OBSERVATION</button></div>
+    <div id="observationLog" class="observation-log"></div>
+  </aside>
+
+  <div class="detail-modal" id="detailModal" aria-hidden="true">
+    <div class="detail-modal-backdrop" id="detailBackdrop"></div>
+    <section class="detail-modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail-modal-head"><div><span class="drawer-kicker">POLARIS OPS // DETAILED OPERATIONS</span><h2 id="detailTitle">GROUND STATION</h2></div><button id="closeDetail" class="modal-close">×</button></div>
+      <iframe id="detailFrame" title="Detailed operational module" src="legacy-operations.html?module=ground&ui=aligned"></iframe>
+    </section>
+  </div>
 </div>
-<script src="js/telemetry.js"></script><script src="js/digital-twin.js"></script><script src="script.js?v=polaris-ice-3"></script>
-<script>
-(function(){
- const svg=document.getElementById('digitalTwin'); const map=document.getElementById('mapStage')||svg; let zoom=1;
- function setZoom(){ if(map===svg) svg.style.transform='scale('+zoom+')'; const z=document.getElementById('sceneZoomReadout'); if(z) z.textContent='ZOOM '+Math.round(zoom*100)+'%'; }
- document.querySelectorAll('[data-action="zoom-in"]').forEach(b=>b.addEventListener('click',()=>{zoom=Math.min(1.55,zoom+.12);setZoom();}));
- document.querySelectorAll('[data-action="zoom-out"]').forEach(b=>b.addEventListener('click',()=>{zoom=Math.max(.8,zoom-.12);setZoom();}));
- document.querySelectorAll('[data-action="reset"]').forEach(b=>b.addEventListener('click',()=>{zoom=1;setZoom();}));
- document.querySelectorAll('[data-layer]').forEach(btn=>btn.addEventListener('click',()=>{btn.classList.toggle('active'); const key=btn.dataset.layer; const on=btn.classList.contains('active'); document.querySelectorAll('[data-layer-name="'+key+'"], [data-layer-name="'+key+'"] *').forEach(el=>{el.style.display=on?'':'none';});}));
- document.querySelectorAll('#digitalTwin .asset-group').forEach(group=>group.addEventListener('click',()=>{document.querySelectorAll('#digitalTwin .asset-group').forEach(g=>g.classList.remove('selected'));group.classList.add('selected'); const key=group.dataset.asset; const label=document.getElementById('moduleLabel'); if(label) label.textContent=(key||'main-station').replace(/-/g,' ').toUpperCase();}));
- document.querySelectorAll('.timeline-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.timeline-item').forEach(x=>x.classList.remove('active'));item.classList.add('active'); const key=item.dataset.focus; const target=document.querySelector('#digitalTwin .asset-group[data-asset="'+key+'"]'); if(target){document.querySelectorAll('#digitalTwin .asset-group').forEach(g=>g.classList.remove('selected'));target.classList.add('selected');}}));
- setZoom();
-})();
-</script>
-</body></html>
+  <script src="js/telemetry.js"></script>
+  <script src="js/digital-twin.js"></script>
+  <script src="script.js?v=ui-refine-1"></script>
+  </body>
+</html>
