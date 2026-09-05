@@ -27,6 +27,7 @@
       weather.classList.toggle('live-asset', live);
       weather.setAttribute('aria-label', live ? `Live weather station: ${format(data?.temperature, 1, ' °C')}, wind ${format(data?.wind_speed, 1, ' km/h')}` : 'Weather station');
     }
+    window.dispatchEvent(new CustomEvent('polaris:telemetry', { detail: data || {} }));
   }
   function start() {
     if (!window.PolarisTelemetry) return;

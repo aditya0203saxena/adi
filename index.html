@@ -27,16 +27,6 @@
     <div class="header-meta"><span id="backendMode">DEMO MODE</span><strong id="utcClock">--:--:-- UTC</strong></div>
   </header>
 
-  <aside class="sidebar">
-    <div class="sidebar-kicker">STATION SYSTEMS</div>
-    <button class="nav-item active" data-view="ground-station"><span class="nav-num">01</span><span><b>GROUND STATION</b><small>Satellite / DRS / RF</small></span></button>
-    <button class="nav-item" data-view="meteorology"><span class="nav-num">02</span><span><b>METEOROLOGY</b><small>Wind / pressure / atmosphere</small></span></button>
-    <button class="nav-item" data-view="compliance"><span class="nav-num">03</span><span><b>COMPLIANCE</b><small>Permits / EIA / biosecurity</small></span></button>
-    <button class="nav-item" data-view="well-being"><span class="nav-num">04</span><span><b>WELL-BEING</b><small>Anonymous crew check-ins</small></span></button>
-    <button class="nav-item" data-view="infrastructure"><span class="nav-num">05</span><span><b>INFRASTRUCTURE</b><small>Assets / heritage / access</small></span></button>
-    <div class="sidebar-foot"><span>ENVIRONMENT</span><strong>ANTARCTIC OPERATIONS</strong><small>Digital-twin demonstrator // non-safety-critical</small></div>
-  </aside>
-
   <main class="center-panel">
     <header class="topbar">
       <div class="topbar-row">
@@ -52,6 +42,13 @@
         <button class="layer-btn active" data-layer="access">ACCESS</button>
         <button class="layer-btn active" data-layer="heritage">HERITAGE</button>
         <button class="layer-btn" data-layer="risk">RISK</button>
+      </div>
+      <div class="ops-strip" aria-label="Station operations">
+        <button class="ops-button" data-panel="stats"><span class="ops-status-dot live"></span>VIEW STATS</button>
+        <button class="ops-button" data-panel="mqtt">DATA TRANSFER <span class="ops-chip">MQTT</span></button>
+        <button class="ops-button" data-panel="power"><span id="powerModeDot" class="ops-status-dot"></span>POWER SAVING <strong id="powerModeLabel">STANDBY</strong></button>
+        <button class="ops-button" data-panel="alerts"><span id="alertCount" class="ops-count">0</span>ALERTS</button>
+        <button class="ops-button" data-panel="upcoming">UPCOMING FEATURES</button>
       </div>
     </header>
 
@@ -170,6 +167,13 @@
     <section class="detail-modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="detail-modal-head"><div><span class="drawer-kicker">POLARIS OPS // DETAILED OPERATIONS</span><h2 id="detailTitle">GROUND STATION</h2></div><button id="closeDetail" class="modal-close">×</button></div>
       <iframe id="detailFrame" title="Detailed operational module" src="legacy-operations.html?module=ground&ui=aligned"></iframe>
+    </section>
+  </div>
+  <div class="ops-modal" id="opsModal" aria-hidden="true">
+    <div class="detail-modal-backdrop" id="opsBackdrop"></div>
+    <section class="ops-modal-card" role="dialog" aria-modal="true" aria-labelledby="opsTitle">
+      <header class="ops-modal-head"><div><span class="drawer-kicker">POLARIS OPS // STATION CONTROL</span><h2 id="opsTitle">VIEW STATS</h2></div><button id="closeOps" class="modal-close" aria-label="Close operations panel">×</button></header>
+      <div id="opsContent" class="ops-modal-content"></div>
     </section>
   </div>
 </div>
