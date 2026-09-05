@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.vscode/
+node_modules/
+dist/
+build/
+*.blend
+*.blend1
+*.bak
