@@ -1,5 +1,11 @@
 /* POLARIS interactive 2.5D + asset drawer restoration */
 .app-shell{grid-template-rows:60px minmax(0,1fr) 54px;grid-template-areas:"header header header" "compartments twin right" "nav nav nav"}
+.map-wrapper{isolation:isolate}
+#threeTwin{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;cursor:grab;touch-action:none}
+#threeTwin:active{cursor:grabbing}
+.map-stage{z-index:2;pointer-events:none}
+.map-stage .scene-hud{pointer-events:none}
+body.model-3d-ready #digitalTwin{display:none}
 .sidebar{grid-area:compartments;min-width:0;min-height:0;display:flex;flex-direction:column;padding:10px 8px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.58);box-shadow:0 10px 34px rgba(46,79,91,.08);backdrop-filter:blur(16px)}
 .sidebar-kicker{padding:4px 6px 9px;color:var(--muted);font:700 .52rem var(--mono);letter-spacing:.15em}
 .nav-item{width:100%;display:flex;align-items:flex-start;gap:8px;text-align:left;border:1px solid rgba(38,78,96,.12);border-radius:9px;background:rgba(255,255,255,.68);padding:9px 7px;color:var(--ink);margin-bottom:6px;transition:.18s ease}

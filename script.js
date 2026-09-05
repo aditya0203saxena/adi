@@ -107,4 +107,5 @@
   checkBackend(); setInterval(checkBackend,5000);
   qa('.layer-btn').forEach(b=>b.classList.toggle('active',state.layers[b.dataset.layer]));
   applyLayers(); selectAsset('main-station'); updateTransform();
+  window.PolarisSelectAsset = selectAsset;
 })();
