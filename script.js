@@ -1,61 +1,100 @@
-const assetData = {
-  'main-station': {
-    title: 'MAIN RESEARCH STATION', status: 'DEMO / NO DATA', risk: 'DEMO WATCH', observation: 'DEMO TRACE: AWAITING TELEMETRY', lastCheck: 'DEMO: 14:22 UTC', systems: ['ENERGY','LABS','CORE'], source: 'Illustrative demo feed. Real telemetry is not connected.', context: 'This station core is serving as a demo reference point for scientific, energy, and mission-readiness interaction flows.'
-  },
-  'laboratory': { title:'LABORATORY MODULE', status:'DEMO / NO DATA', risk:'DEMO WATCH', observation:'DEMO TRACE: AWAITING TELEMETRY', lastCheck:'DEMO: 14:23 UTC', systems:['BIOLOGY','FIELD SCIENCE','CLEAN ROOM'], source:'Illustrative demo feed. Real instrumentation is not connected.', context:'Research modules are ready for instrumentation review and scientific workflow handoff in demo mode.' },
-  'communications': { title:'COMMUNICATIONS ARRAY', status:'DEMO / NO LIVE DATA', risk:'DEMO WATCH', observation:'DEMO TRACE: LINK STANDBY', lastCheck:'DEMO: 14:21 UTC', systems:['HF / TTC','SATELLITE LINK','ANTENNA'], source:'Illustrative demo feed. Real RF telemetry is not connected.', context:'Communications assets are shown as a mission-control interaction layer for link status and satellite handoff.' },
-  'weather': { title:'WEATHER STATION', status:'DEMO / NO LIVE DATA', risk:'DEMO WATCH', observation:'DEMO TRACE: SENSOR STANDBY', lastCheck:'DEMO: 14:24 UTC', systems:['TEMP','WIND','PRESSURE','HUMIDITY'], source:'Illustrative demo feed. Real weather telemetry is not connected.', context:'Weather instrumentation is visualized for later MQTT sensor integration and environmental risk scoring.' },
-  'power': { title:'POWER / ENERGY SYSTEM', status:'DEMO / NO LIVE DATA', risk:'DEMO WATCH', observation:'DEMO TRACE: LOAD STANDBY', lastCheck:'DEMO: 14:25 UTC', systems:['GENERATOR','FUEL','LOAD','BACKUP'], source:'Illustrative demo feed. Real energy telemetry is not connected.', context:'Energy infrastructure is represented as a station readiness asset with future sensor-driven status.' },
-  'runway': { title:'RUNWAY / ACCESS', status:'DEMO / MONITORED', risk:'DEMO WATCH', observation:'DEMO TRACE: ACCESS CLEAR', lastCheck:'DEMO: 14:26 UTC', systems:['RUNWAY','ACCESS ROAD','FIELD OPS'], source:'Illustrative demo feed. Real route data is not connected.', context:'Runway and access are mapped as operational assets for field movement and weather-aware planning.' },
-  'heritage': { title:'HERITAGE SITE', status:'DEMO / TRACKED', risk:'DEMO WATCH', observation:'DEMO TRACE: PRESERVATION CHECK', lastCheck:'DEMO: 14:27 UTC', systems:['STRUCTURE','DOCUMENTATION','PRESERVATION'], source:'Illustrative demo feed. Real heritage records are not connected.', context:'Heritage assets are represented for preservation logging and infrastructure planning.' },
-  'satellite-a': { title:'SATELLITE A', status:'DEMO / PASS SCHEDULED', risk:'DEMO WATCH', observation:'DEMO TRACE: TRACKING', lastCheck:'DEMO: 14:20 UTC', systems:['TTC','PASS','RF LINK'], source:'Illustrative orbital feed.', context:'Satellite A is shown as an orbital linkage for ground-station mission-control interaction.' },
-  'satellite-b': { title:'SATELLITE B', status:'DEMO / PASS SCHEDULED', risk:'DEMO WATCH', observation:'DEMO TRACE: TRACKING', lastCheck:'DEMO: 14:19 UTC', systems:['TTC','PASS','RF LINK'], source:'Illustrative orbital feed.', context:'Satellite B is shown as an orbital linkage for ground-station mission-control interaction.' }
-};
+(() => {
+  // Load the restored interaction layer without disturbing the existing layout CSS.
+  const uiCss = document.createElement('link');
+  uiCss.rel = 'stylesheet';
+  uiCss.href = 'ui-interaction.css?v=2.5d-restore-1';
+  document.head.appendChild(uiCss);
 
-const state = { selectedAsset:'main-station', zoom:1, panX:0, panY:0, targetPanX:0, targetPanY:0, targetZoom:1, dragging:false, dragStartX:0, dragStartY:0, pointerStartX:0, pointerStartY:0, animatingCamera:true, layers:{infrastructure:true,satellites:false,weather:true,wind:true,lidar:false,access:true,heritage:true,risk:false} };
+  const assetData = {
+    'main-station': ['MAIN RESEARCH STATION','DEMO / NO DATA','DEMO WATCH',['ENERGY','LABS','CORE'],'Illustrative demo feed. Real telemetry is not connected.','This station core is the primary digital-twin reference point.'],
+    'weather': ['WEATHER STATION','DEMO / NO LIVE DATA','DEMO WATCH',['TEMP','WIND','PRESSURE','HUMIDITY'],'Illustrative demo feed. Real weather telemetry is not connected.','Weather instrumentation is prepared for MQTT sensor integration and risk scoring.'],
+    'communications': ['COMMUNICATIONS ARRAY','DEMO / NO LIVE DATA','DEMO WATCH',['HF / TTC','SATELLITE LINK','ANTENNA'],'Illustrative demo feed.','Communications assets represent ground-station and satellite-link workflows.'],
+    'power': ['POWER / ENERGY SYSTEM','DEMO / NO LIVE DATA','DEMO WATCH',['GENERATOR','FUEL','LOAD','BACKUP'],'Illustrative demo feed.','Energy infrastructure is represented for station-readiness monitoring.'],
+    'runway': ['RUNWAY / ACCESS','DEMO / MONITORED','DEMO WATCH',['RUNWAY','ACCESS ROAD','FIELD OPS'],'Illustrative demo feed.','Runway and access are mapped for field movement and planning.'],
+    'heritage': ['HERITAGE SITE','DEMO / TRACKED','DEMO WATCH',['STRUCTURE','DOCUMENTATION','PRESERVATION'],'Illustrative demo feed.','Heritage assets are represented for preservation logging.'],
+    'satellite-a': ['SATELLITE A','DEMO / PASS SCHEDULED','DEMO WATCH',['TTC','PASS','RF LINK'],'Illustrative orbital feed.','Satellite A is an orbital linkage for mission-control interaction.'],
+    'satellite-b': ['SATELLITE B','DEMO / PASS SCHEDULED','DEMO WATCH',['TTC','PASS','RF LINK'],'Illustrative orbital feed.','Satellite B is an orbital linkage for mission-control interaction.']
+  };
 
-const drawer = document.getElementById('assetDrawer');
-const detailFrame = document.getElementById('detailFrame');
-const detailModal = document.getElementById('detailModal');
-const detailTitle = document.getElementById('detailTitle');
-const mapStage = document.getElementById('mapStage');
-const svgInner = document.getElementById('digitalTwinInner');
-const sceneZoomReadout = document.getElementById('sceneZoomReadout');
-const assetTooltip = document.getElementById('assetTooltip');
-const observationLog = document.getElementById('observationLog');
-const focusAssetButton = document.getElementById('focusAssetButton');
+  const state = { selected:'main-station', zoom:1, panX:0, panY:0, dragging:false, startX:0, startY:0, startPanX:0, startPanY:0, layers:{satellites:true,risk:false,weather:true,wind:true,infrastructure:true,access:true,heritage:true,lidar:false} };
+  const q = s => document.querySelector(s);
+  const qa = s => [...document.querySelectorAll(s)];
+  const stage = q('#mapStage');
+  const svg = q('#digitalTwin');
+  const drawer = q('#assetDrawer');
+  const modal = q('#detailModal');
 
-function ensureSelectionReticle(){let r=document.getElementById('selectionReticle');if(r)return r;r=document.createElementNS('http://www.w3.org/2000/svg','g');r.id='selectionReticle';r.setAttribute('pointer-events','none');r.innerHTML='<circle class="selection-reticle-ring" cx="0" cy="0" r="34" fill="none" stroke="#7ae8dc" stroke-width="1.5" stroke-dasharray="5 7"/><circle class="selection-reticle-core" cx="0" cy="0" r="5" fill="#7ae8dc" fill-opacity=".18" stroke="#7ae8dc" stroke-width="1"/><path d="M0 -47 V-35 M0 35 V47 M-47 0 H-35 M35 0 H47" stroke="#7ae8dc" stroke-width="1" stroke-opacity=".55"/>';svgInner.appendChild(r);return r;}
-function updateSelectionReticle(k){const r=ensureSelectionReticle(), el=document.querySelector(`.asset-group[data-asset="${k}"]`);if(!el)return;const b=el.getBBox();r.setAttribute('transform',`translate(${b.x+b.width/2} ${b.y+b.height/2})`);r.classList.remove('reticle-pulse');void r.offsetWidth;r.classList.add('reticle-pulse');}
-function positionTooltip(ev,k){if(!assetTooltip||!mapStage)return;const rect=mapStage.getBoundingClientRect(),x=Math.min(Math.max(ev.clientX-rect.left+14,12),rect.width-175),y=Math.min(Math.max(ev.clientY-rect.top+14,12),rect.height-65),a=assetData[k]||assetData['main-station'];assetTooltip.style.left=`${x}px`;assetTooltip.style.top=`${y}px`;assetTooltip.innerHTML=`<strong>${a.title}</strong><span>${a.status}</span>`;assetTooltip.classList.add('show');assetTooltip.setAttribute('aria-hidden','false');}
-function hideTooltip(){if(!assetTooltip)return;assetTooltip.classList.remove('show');assetTooltip.setAttribute('aria-hidden','true');}
-function setSelectedAsset(k,focus=false){if(!assetData[k])return;state.selectedAsset=k;document.querySelectorAll('.asset-group').forEach(el=>el.classList.toggle('selected',el.dataset.asset===k));const a=assetData[k];for(const [id,val] of [['asset-title',a.title],['asset-status',a.status],['asset-risk',a.risk],['asset-observation',a.observation],['asset-last-check',a.lastCheck],['asset-source',a.source],['asset-context-note',a.context]]){const el=document.getElementById(id);if(el)el.textContent=val;}const tag=document.getElementById('asset-status-tag');if(tag)tag.textContent=a.status;const list=document.getElementById('asset-systems');if(list)list.innerHTML=a.systems.map(x=>`<li>${x}</li>`).join('');updateSelectionReticle(k);if(focus)focusAsset(k);}
-function focusAsset(k){const el=document.querySelector(`.asset-group[data-asset="${k}"]`);if(!el)return;const b=el.getBBox();const svg=document.getElementById('digitalTwin');const vb=svg.viewBox.baseVal;const cx=b.x+b.width/2,cy=b.y+b.height/2;state.targetZoom=Math.max(1.15,state.targetZoom);state.targetPanX=vb.width/2-cx;state.targetPanY=vb.height/2-cy;state.animatingCamera=true;}
-function updateTransform(){if(!mapStage)return;mapStage.style.transform=`translate3d(${state.panX}px,${state.panY}px,0) scale(${state.zoom})`;if(sceneZoomReadout)sceneZoomReadout.textContent=`ZOOM ${Math.round(state.zoom*100)}%`;}
-function animateCamera(){if(!state.animatingCamera)return;state.zoom+=(state.targetZoom-state.zoom)*.08;state.panX+=(state.targetPanX-state.panX)*.08;state.panY+=(state.targetPanY-state.panY)*.08;if(Math.abs(state.zoom-state.targetZoom)<.001&&Math.abs(state.panX-state.targetPanX)<.4&&Math.abs(state.panY-state.targetPanY)<.4){state.zoom=state.targetZoom;state.panX=state.targetPanX;state.panY=state.targetPanY;state.animatingCamera=false;}updateTransform();}
-function handleZoom(delta){state.animatingCamera=false;const n=Math.min(2.2,Math.max(.7,state.zoom+delta));state.zoom=n;state.targetZoom=n;updateTransform();}
-function resetView(){state.targetZoom=1;state.targetPanX=0;state.targetPanY=0;state.animatingCamera=true;}
-function setLayerState(layer){state.layers[layer]=!state.layers[layer];const b=document.querySelector(`[data-layer="${layer}"]`);if(b)b.classList.toggle('active',state.layers[layer]);applyLayers();}
-function applyLayers(){document.querySelectorAll('.layer-group').forEach(g=>{const names=(g.dataset.laysers||g.dataset.layers||'').split(/\s+/).filter(Boolean);const visible=names.every(n=>state.layers[n]!==false);g.style.display=visible?'':'none';});document.querySelectorAll('.risk-label').forEach(x=>x.parentElement.style.display=state.layers.risk?'':'none');}
-function handlePointerDown(ev){state.dragging=true;state.dragStartX=ev.clientX;state.dragStartY=ev.clientY;state.pointerStartX=state.panX;state.pointerStartY=state.panY;state.animatingCamera=false;mapStage?.classList.add('dragging');}
-function handlePointerMove(ev){if(!state.dragging)return;state.panX=state.pointerStartX+(ev.clientX-state.dragStartX);state.panY=state.pointerStartY+(ev.clientY-state.dragStartY);updateTransform();}
-function handlePointerUp(){state.dragging=false;mapStage?.classList.remove('dragging');}
-function addObservation(){const e=window.prompt('Add an observation note for the selected asset:','Observation logged: awaiting field validation');if(!e)return;const item=document.createElement('div');item.className='log-entry';item.textContent=`${assetData[state.selectedAsset].title} — ${e}`;observationLog?.prepend(item);}
-function openDetailedModule(view){const cfg={ground:{module:'ground',title:'GROUND STATION & DRS MISSION CONTROL'},'ground-station':{module:'ground',title:'GROUND STATION & DRS MISSION CONTROL'},meteorology:{module:'meteorology',title:'METEOROLOGY & ATMOSPHERIC RESILIENCE'},compliance:{module:'compliance',title:'REGULATORY & ENVIRONMENTAL COMPLIANCE'},'well-being':{module:'wellbeing',title:'WINTER-OVER WELL-BEING HUB'},infrastructure:{module:'infrastructure',title:'INFRASTRUCTURE & HERITAGE TRACKER'}}[view];if(!cfg)return;detailTitle.textContent=cfg.title;detailFrame.src=`legacy-operations.html?module=${cfg.module}&ui=aligned`;detailModal.classList.add('open');detailModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
-function closeDetailedModule(){detailModal.classList.remove('open');detailModal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
+  function setText(id, value){ const el=q(id); if(el) el.textContent=value; }
+  function updateDrawer(key){
+    const a=assetData[key]||assetData['main-station'];
+    setText('#asset-title',a[0]); setText('#asset-status',a[1]); setText('#asset-risk',a[2]); setText('#asset-observation','DEMO TRACE: AWAITING TELEMETRY'); setText('#asset-last-check','DEMO: '+new Date().toISOString().slice(11,16)+' UTC'); setText('#asset-source',a[4]); setText('#asset-context-note',a[5]);
+    const tag=q('#asset-status-tag'); if(tag) tag.textContent=a[1];
+    const list=q('#asset-systems'); if(list) list.innerHTML=a[3].map(x=>`<li>${x}</li>`).join('');
+    if(drawer) drawer.classList.remove('collapsed');
+  }
+  function selectAsset(key,focus=false){
+    if(!assetData[key]) return;
+    state.selected=key;
+    qa('.asset-group').forEach(el=>el.classList.toggle('selected',el.dataset.asset===key));
+    updateDrawer(key);
+    if(focus) focusAsset(key);
+  }
+  function focusAsset(key){
+    const el=q(`.asset-group[data-asset="${key}"]`); if(!el||!svg) return;
+    const b=el.getBBox(), vb=svg.viewBox.baseVal;
+    state.panX=vb.width/2-(b.x+b.width/2); state.panY=vb.height/2-(b.y+b.height/2); state.zoom=Math.max(state.zoom,1.2); updateTransform();
+  }
+  function updateTransform(){
+    if(stage) stage.style.transform=`translate3d(${state.panX}px,${state.panY}px,0) scale(${state.zoom})`;
+    setText('#sceneZoomReadout',`ZOOM ${Math.round(state.zoom*100)}%`);
+  }
+  function openModule(view){
+    const cfg={
+      'ground-station':['ground','GROUND STATION & DRS MISSION CONTROL'],
+      meteorology:['meteorology','METEOROLOGY & ATMOSPHERIC RESILIENCE'],
+      compliance:['compliance','REGULATORY & ENVIRONMENTAL COMPLIANCE'],
+      'well-being':['wellbeing','WINTER-OVER WELL-BEING HUB'],
+      infrastructure:['infrastructure','INFRASTRUCTURE & HERITAGE TRACKER']
+    }[view];
+    if(!cfg||!modal) return;
+    const title=q('#detailTitle'); const frame=q('#detailFrame');
+    if(title) title.textContent=cfg[1];
+    if(frame) frame.src=`legacy-operations.html?module=${cfg[0]}&ui=aligned`;
+    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
+  }
+  function closeModule(){ if(!modal)return; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); }
+  function setLayer(layer){
+    state.layers[layer]=!state.layers[layer];
+    const btn=q(`[data-layer="${layer}"]`); if(btn) btn.classList.toggle('active',state.layers[layer]);
+    qa('.layer-group').forEach(g=>{
+      const names=(g.dataset.layers||'').split(/\s+/).filter(Boolean); if(names.length) g.style.display=names.some(n=>state.layers[n]===false)?'none':'';
+    });
+  }
+  function addObservation(){
+    const note=window.prompt('Add an observation note for the selected asset:','Observation logged: awaiting field validation');
+    if(!note)return; const el=document.createElement('div'); el.className='log-entry'; el.textContent=`${assetData[state.selected][0]} — ${note}`; q('#observationLog')?.prepend(el);
+  }
 
-document.querySelectorAll('.asset-group').forEach(item=>{item.addEventListener('click',()=>setSelectedAsset(item.dataset.asset,false));item.addEventListener('mouseenter',e=>positionTooltip(e,item.dataset.asset));item.addEventListener('mousemove',e=>positionTooltip(e,item.dataset.asset));item.addEventListener('mouseleave',hideTooltip);});
-document.querySelectorAll('.satellite-node').forEach(item=>item.addEventListener('click',()=>{state.layers.satellites=true;document.querySelector('[data-layer="satellites"]')?.classList.add('active');applyLayers();setSelectedAsset(item.dataset.asset,false);}));
-document.querySelectorAll('.layer-btn').forEach(b=>b.addEventListener('click',()=>setLayerState(b.dataset.layer)));
-document.querySelectorAll('.timeline-item').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.timeline-item').forEach(x=>x.classList.toggle('active',x===b));setSelectedAsset(b.dataset.focus==='weather'?'weather':b.dataset.focus,true);}));
-document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.action==='zoom-in')handleZoom(.15);if(b.dataset.action==='zoom-out')handleZoom(-.15);if(b.dataset.action==='reset')resetView();}));
-document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===b));openDetailedModule(b.dataset.view);}));
-document.querySelectorAll('.subsystem').forEach(b=>b.addEventListener('click',()=>openDetailedModule(b.dataset.view)));
-document.getElementById('openDetailedButton')?.addEventListener('click',()=>openDetailedModule(state.selectedAsset==='weather'?'meteorology':'ground-station'));
-document.getElementById('closeDetail')?.addEventListener('click',closeDetailedModule);document.getElementById('detailBackdrop')?.addEventListener('click',closeDetailedModule);document.getElementById('closeDrawer')?.addEventListener('click',()=>drawer?.classList.add('collapsed'));document.getElementById('addObservationButton')?.addEventListener('click',addObservation);focusAssetButton?.addEventListener('click',()=>focusAsset(state.selectedAsset));
-mapStage?.addEventListener('pointerdown',handlePointerDown);window.addEventListener('pointermove',handlePointerMove);window.addEventListener('pointerup',handlePointerUp);window.addEventListener('pointerleave',handlePointerUp);
-setInterval(animateCamera,16);
-document.addEventListener('keydown',e=>{if(e.key==='ArrowUp'){state.animatingCamera=false;state.panY-=18;updateTransform()}if(e.key==='ArrowDown'){state.animatingCamera=false;state.panY+=18;updateTransform()}if(e.key==='ArrowLeft'){state.animatingCamera=false;state.panX-=18;updateTransform()}if(e.key==='ArrowRight'){state.animatingCamera=false;state.panX+=18;updateTransform()}if(e.key==='+')handleZoom(.15);if(e.key==='-')handleZoom(-.15);if(e.key==='0')resetView();if(e.key==='Escape')closeDetailedModule();});
-applyLayers();setSelectedAsset('main-station',false);updateTransform();
-function updateClock(){const el=document.getElementById('utcClock');if(el)el.textContent=new Date().toISOString().slice(11,19)+' UTC'} updateClock();setInterval(updateClock,1000);
-async function checkBackend(){const mode=document.getElementById('backendMode');try{const r=await fetch('/api/health',{cache:'no-store'});if(!r.ok)throw new Error();const p=await r.json();if(mode)mode.textContent=p.mqtt_connected?'LIVE MQTT':'API ONLINE / MQTT WAITING'}catch(e){if(mode)mode.textContent='DEMO MODE'}} checkBackend();setInterval(checkBackend,5000);
+  qa('.asset-group').forEach(el=>{
+    el.addEventListener('click',e=>{ e.stopPropagation(); selectAsset(el.dataset.asset,false); });
+    el.addEventListener('mouseenter',e=>showTip(e,el.dataset.asset)); el.addEventListener('mousemove',e=>showTip(e,el.dataset.asset)); el.addEventListener('mouseleave',hideTip);
+  });
+  function showTip(e,key){ const t=q('#assetTooltip'); if(!t||!stage)return; const a=assetData[key]; const r=stage.getBoundingClientRect(); t.style.left=Math.min(Math.max(e.clientX-r.left+14,12),r.width-190)+'px'; t.style.top=Math.min(Math.max(e.clientY-r.top+14,12),r.height-70)+'px'; t.innerHTML=`<strong>${a[0]}</strong><span>${a[1]}</span>`; t.classList.add('show'); }
+  function hideTip(){q('#assetTooltip')?.classList.remove('show');}
+  qa('.satellite-node').forEach(el=>el.addEventListener('click',()=>{state.layers.satellites=true;q('[data-layer="satellites"]')?.classList.add('active');qa('[data-layer-group]');selectAsset(el.dataset.asset,false);}));
+  qa('.layer-btn').forEach(b=>b.addEventListener('click',()=>setLayer(b.dataset.layer)));
+  qa('.timeline-item').forEach(b=>b.addEventListener('click',()=>{qa('.timeline-item').forEach(x=>x.classList.toggle('active',x===b));selectAsset(b.dataset.focus==='weather'?'weather':b.dataset.focus,true);}));
+  qa('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='zoom-in')state.zoom=Math.min(2.2,state.zoom+.15);if(a==='zoom-out')state.zoom=Math.max(.7,state.zoom-.15);if(a==='reset'){state.zoom=1;state.panX=0;state.panY=0;}updateTransform();}));
+  qa('.nav-item').forEach(b=>b.addEventListener('click',()=>{qa('.nav-item').forEach(x=>x.classList.toggle('active',x===b));openModule(b.dataset.view);}));
+  qa('.subsystem').forEach(b=>b.addEventListener('click',()=>openModule(b.dataset.view)));
+  q('#openDetailedButton')?.addEventListener('click',()=>openModule(state.selected==='weather'?'meteorology':'ground-station'));
+  q('#closeDetail')?.addEventListener('click',closeModule); q('#detailBackdrop')?.addEventListener('click',closeModule); q('#closeDrawer')?.addEventListener('click',()=>drawer?.classList.add('collapsed')); q('#addObservationButton')?.addEventListener('click',addObservation);
+  stage?.addEventListener('pointerdown',e=>{state.dragging=true;state.startX=e.clientX;state.startY=e.clientY;state.startPanX=state.panX;state.startPanY=state.panY;stage.classList.add('dragging');});
+  window.addEventListener('pointermove',e=>{if(!state.dragging)return;state.panX=state.startPanX+e.clientX-state.startX;state.panY=state.startPanY+e.clientY-state.startY;updateTransform();});
+  window.addEventListener('pointerup',()=>{state.dragging=false;stage?.classList.remove('dragging');});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModule();if(e.key==='0'){state.zoom=1;state.panX=0;state.panY=0;updateTransform();}});
+  function updateClock(){setText('#utcClock',new Date().toISOString().slice(11,19)+' UTC');} updateClock();setInterval(updateClock,1000);
+  async function checkBackend(){try{const r=await fetch('/api/health',{cache:'no-store'});if(!r.ok)throw 0;const p=await r.json();setText('#backendMode',p.mqtt_connected?'LIVE MQTT':'API ONLINE / MQTT WAITING');}catch{setText('#backendMode','DEMO MODE');}}
+  checkBackend(); setInterval(checkBackend,5000);
+  selectAsset('main-station'); updateTransform();
+})();
