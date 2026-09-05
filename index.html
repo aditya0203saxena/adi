@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>POLARIS OPS — Digital Twin Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <header class="header">
+    <div class="brand"><div class="mark">P</div><div><b>POLARIS OPS</b><span>ANTARCTIC DIGITAL TWIN // TEST</span></div></div>
+    <div class="station">MAITRI STATION <span>//</span> 70.76° S, 11.74° E</div>
+    <div class="clock" id="clock">--:--:-- UTC</div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="kicker">OPERATIONAL MODULES</div>
+    <button class="module active" data-module="ground"><b>01</b><span>GROUND STATION<small>Satellite / DRS / RF</small></span></button>
+    <button class="module" data-module="meteorology"><b>02</b><span>METEOROLOGY<small>Wind / pressure / atmosphere</small></span></button>
+    <button class="module" data-module="compliance"><b>03</b><span>COMPLIANCE<small>Permits / EIA / biosecurity</small></span></button>
+    <button class="module" data-module="well-being"><b>04</b><span>WELL-BEING<small>Anonymous crew check-ins</small></span></button>
+    <button class="module" data-module="infrastructure"><b>05</b><span>INFRASTRUCTURE<small>Assets / heritage / access</small></span></button>
+    <div class="status-card"><div class="kicker">BACKEND LINK</div><strong id="backendState">CHECKING…</strong><p id="backendSource">Telemetry gateway</p></div>
+  </aside>
+
+  <main class="main">
+    <section class="hero"><div><div class="kicker">POLAR RESEARCH COMPLEX // DIGITAL TWIN</div><h1>LIVE OPERATIONS CONSOLE</h1><p>Sensor → MQTT → FastAPI → risk engine → this browser.</p></div><div class="risk-chip" id="riskChip">NO DATA</div></section>
+
+    <section class="telemetry">
+      <div class="panel-head"><span>LIVE TELEMETRY</span><small id="telemetryUpdated">WAITING</small></div>
+      <div class="metrics">
+        <div><label>TEMPERATURE</label><strong id="temperature">NO DATA</strong></div>
+        <div><label>WIND</label><strong id="wind">NO DATA</strong></div>
+        <div><label>PRESSURE</label><strong id="pressure">NO DATA</strong></div>
+        <div><label>HUMIDITY</label><strong id="humidity">NO DATA</strong></div>
+        <div><label>RISK SCORE</label><strong id="riskScore">—</strong></div>
+        <div><label>TRANSPORT</label><strong id="transport">OFFLINE</strong></div>
+      </div>
+    </section>
+
+    <section class="twin-grid">
+      <div class="panel scene"><div class="panel-head"><span>STATION DIGITAL TWIN</span><small>DT-01</small></div><div class="scene-inner" id="scene"><div class="orbit o1"></div><div class="orbit o2"></div><div class="station-core"><i></i><b>MAITRI</b><small>STATION CORE</small></div><div class="asset weather" data-asset="weather">MET</div><div class="asset power" data-asset="power">PWR</div><div class="asset comms" data-asset="communications">RF</div><div class="runway"></div><div class="risk-zone rz1"></div><div class="risk-zone rz2"></div><div class="north">N</div></div></div>
+      <div class="panel detail"><div class="panel-head"><span>SELECTED MODULE</span><small id="moduleLabel">GROUND STATION</small></div><div class="detail-body"><iframe id="moduleFrame" title="Operational module" src="legacy-operations.html?module=ground"></iframe></div></div>
+    </section>
+  </main>
+</div>
+<script src="js/telemetry.js"></script>
+<script src="js/digital-twin.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
