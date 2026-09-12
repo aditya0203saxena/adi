@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POLARIS OPS — Digital Twin V2</title>
+<meta name="description" content="POLARIS operational digital twin with live telemetry, synchronized state, risk, prediction and what-if simulation.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="framework-v2.css?v=1">
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">P</div><div><b>POLARIS OPS</b><span>ANTARCTIC DIGITAL TWIN // DT-02</span></div></div>
+  <div class="top-status"><span class="status"><i id="connDot" class="dot"></i><span id="connectionText">DEMO / NO BACKEND</span></span><span>MAITRI // 70.76° S, 11.74° E</span><span id="backendMode">DEMO</span><span id="utc">--:--:-- UTC</span></div>
+</header>
+
+<aside class="sidebar">
+  <div class="section-label">OPERATIONS</div>
+  <div class="nav">
+    <button class="active" data-view="twin"><span class="nav-code">01</span><div><div class="nav-title">TWIN OVERVIEW</div><small>LIVE STATE</small></div></button>
+    <button data-view="assets"><span class="nav-code">02</span><div><div class="nav-title">ASSET GRAPH</div><small>DEPENDENCIES</small></div></button>
+    <button data-view="simulate"><span class="nav-code">03</span><div><div class="nav-title">SCENARIO LAB</div><small>WHAT-IF</small></div></button>
+    <button data-view="data"><span class="nav-code">04</span><div><div class="nav-title">DATA FABRIC</div><small>MQTT / API</small></div></button>
+    <button data-view="modules"><span class="nav-code">05</span><div><div class="nav-title">MISSION MODULES</div><small>OPERATIONAL APPS</small></div></button>
+  </div>
+  <div class="section-label" style="margin-top:14px">TWIN HEALTH</div>
+  <div class="card">
+    <div class="mini-health"><div class="mini-row"><span>STATE SYNC</span><b id="stateValue">SIMULATION READY</b></div><div class="bar" id="healthBar"><i style="width:54%"></i></div><div class="mini-row"><span>HEALTH</span><b id="healthValue">54%</b></div><div class="mini-row"><span>POWER POLICY</span><b id="powerValue">NORMAL</b></div></div>
+  </div>
+  <div class="sidebar-footer"><div class="mini-row"><span>MODEL</span><b>POLARIS / DT-02</b></div><div class="mini-row"><span>MODE</span><b>HUMAN-IN-LOOP</b></div></div>
+</aside>
+
+<main class="main">
+  <section class="hero"><div><div class="eyebrow">POLAR RESEARCH COMPLEX // MAITRI</div><h1>Operational Digital Twin</h1><p>One synchronized state across physical sensors, station subsystems, risk, simulation and operator decisions. The 3D/2.5D scene is the visualization layer—not the twin itself.</p></div><div class="hero-actions"><button class="btn" id="syncBtn">SYNC STATE</button><button class="btn" id="dataBtn">DATA FABRIC</button><button class="btn primary" id="simulateBtn">RUN SCENARIO</button></div></section>
+  <section class="twin-shell">
+    <div class="twin-grid"></div>
+    <div id="twinStage" style="position:absolute;inset:0;overflow:hidden"><svg id="twinSvg" viewBox="0 0 1000 610" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Maitri digital twin scene"><g id="twinScene">
+      <ellipse class="station-shadow" cx="500" cy="475" rx="345" ry="62"/>
+      <path d="M95 430 Q220 365 390 376 Q540 330 690 384 Q830 392 925 440 L890 525 Q690 558 500 542 Q270 565 110 512Z" fill="#102c3a" stroke="#2d5567" stroke-width="2"/>
+      <path d="M104 454 Q270 405 430 425 T890 450" class="wind"/>
+      <ellipse cx="515" cy="334" rx="305" ry="112" class="orbit"/><ellipse cx="515" cy="334" rx="398" ry="152" class="orbit"/>
+      <path d="M145 205 C280 155 345 190 470 214 S720 255 885 185" class="wind"/>
+      <path d="M170 232 C305 187 390 214 500 242 S720 278 850 220" class="wind" opacity=".45"/>
+      <g class="asset" data-asset="main-station">
+        <path d="M300 325 L650 325 L740 372 L390 372Z" fill="#e2eef2" stroke="#6b8792" stroke-width="2"/>
+        <path d="M300 325 L390 372 L390 470 L300 424Z" fill="#9fb7c0" stroke="#5b737d"/>
+        <path class="asset-core" d="M390 372 L740 372 L740 462 L390 470Z" fill="#0d2533" stroke="#35596b" stroke-width="2"/>
+        <path d="M330 337 L520 337 L584 360 L394 360Z" class="panel-live"/>
+        <g class="pulse"><rect x="444" y="394" width="42" height="48" rx="4" fill="#6daeff" fill-opacity=".2" stroke="#6daeff" stroke-opacity=".6"/><rect x="499" y="392" width="42" height="50" rx="4" fill="#6daeff" fill-opacity=".2" stroke="#6daeff" stroke-opacity=".6"/><rect x="554" y="392" width="42" height="50" rx="4" fill="#58e2d0" fill-opacity=".13" stroke="#58e2d0" stroke-opacity=".6"/></g>
+        <text x="455" y="462" class="asset-label">MAITRI CORE</text><text x="456" y="478" class="asset-value">LABS // HVAC // WINTER-OVER</text>
+      </g>
+      <g class="asset" data-asset="power"><path d="M145 388 L232 350 L325 378 L238 418Z" class="panel-warn"/><path d="M145 388 L238 418 L238 480 L145 451Z" fill="#91abb5" stroke="#506c77"/><path d="M238 418 L325 378 L325 440 L238 480Z" fill="#718e9a" stroke="#506c77"/><rect x="191" y="397" width="18" height="43" fill="#ffc96b" fill-opacity=".72"/><rect x="217" y="388" width="18" height="43" fill="#ff9c62" fill-opacity=".55"/><text x="142" y="498" class="asset-label">POWER</text><text x="142" y="514" class="asset-value">GEN // FUEL // LOAD</text></g>
+      <g class="asset" data-asset="communications"><ellipse cx="180" cy="304" rx="60" ry="20" transform="rotate(-22 180 304)" fill="#cbdfe6" stroke="#4e707e" stroke-width="2"/><path d="M180 304 L250 242" stroke="#587784" stroke-width="7"/><circle cx="180" cy="304" r="7" fill="#58e2d0"/><path d="M123 328 Q182 272 247 290" class="wire"/><text x="118" y="355" class="asset-label">RF / COMMS</text><text x="119" y="371" class="asset-value">SATCOM // HF // TTC</text></g>
+      <g class="asset" data-asset="weather"><rect x="454" y="230" width="134" height="70" rx="10" class="panel-live"/><circle cx="477" cy="266" r="5" fill="#67a9ff"/><path d="M492 278h70" stroke="#67a9ff" stroke-width="3" stroke-linecap="round"/><text x="470" y="252" class="asset-label">MET NODE</text><text x="470" y="290" class="asset-value">TEMP // WIND // RH // P</text></g>
+      <g class="asset" data-asset="runway"><path d="M64 500 L405 461 L927 485 L885 532 L430 512 L88 548Z" fill="#edf4f6" stroke="#708b96"/><path d="M125 517 L450 489 L840 505" stroke="#ffc96b" stroke-width="3" stroke-dasharray="16 16" fill="none"/><text x="726" y="480" class="asset-label">RUNWAY / ACCESS</text></g>
+      <g class="asset" data-asset="heritage"><path d="M720 372 L752 342 L785 372 L780 432 L726 432Z" fill="#cfc3e2" stroke="#ae8cff"/><path d="M715 374 L752 337 L790 374" fill="#bdadd4" stroke="#ae8cff"/><circle cx="752" cy="398" r="6" fill="#ae8cff"/><text x="701" y="454" class="asset-label">HERITAGE</text></g>
+      <g class="asset" data-asset="satellite-a"><circle cx="836" cy="140" r="11" fill="#67a9ff"/><path d="M820 140h-23m55 0h22M836 124v-19m0 51v18" stroke="#67a9ff" stroke-width="2"/><text x="858" y="133" class="asset-label">SAT-A</text></g>
+      <g class="asset" data-asset="satellite-b"><circle cx="194" cy="136" r="11" fill="#58e2d0"/><path d="M178 136h-23m55 0h22M194 120v-19m0 51v18" stroke="#58e2d0" stroke-width="2"/><text x="215" y="129" class="asset-label">SAT-B</text></g>
+      <path d="M194 136 Q330 222 506 282 T836 140" class="wire"/>
+      <path d="M390 470 C515 505 650 502 742 462" class="wire" opacity=".45"/>
+      <g><text x="74" y="92" class="asset-label" fill="#58e2d0">DIGITAL TWIN / SCENE DT-02</text><text x="74" y="110" class="asset-value">PHYSICAL STATE → COMPUTATIONAL STATE → DECISION SUPPORT</text></g>
+      <g class="risk-zone"><path d="M268 260 L439 235 L502 290 L349 344 L255 309Z"/></g><g class="risk-zone"><path d="M635 258 L832 228 L899 286 L740 344 L624 304Z"/></g>
+    </g></svg></div>
+    <div class="scene-hud"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="scene-readout"><span>SCENE // DT-02</span><span>ZOOM <span id="zoomValue">100%</span></span></div><div class="scene-mode">HUMAN-IN-LOOP</div><div class="scene-tag">Click an asset · drag to pan · use zoom controls</div><div class="scene-cross"></div></div>
+    <div class="toast" id="toast"></div>
+    <div style="position:absolute;right:17px;bottom:17px;display:flex;gap:6px"><button class="btn" id="zoomOut">−</button><button class="btn" id="resetScene">RESET</button><button class="btn" id="zoomIn">+</button></div>
+  </section>
+</main>
+
+<aside class="rightbar">
+  <div class="right-head"><div><small>SELECTED TWIN STATE</small><h2 id="assetName">Maitri Research Station</h2><small id="assetType">CORE</small></div><div><span id="riskBadge" class="state-badge">NO DATA</span><div style="height:5px"></div><span id="stateBadge" class="state-badge">SYNC READY</span></div></div>
+  <div class="state-scroll">
+    <div class="card"><div class="card-title">CURRENT ENVIRONMENT</div><div class="metrics"><div class="metric"><span>TEMPERATURE</span><strong id="tempValue">—</strong><em>ambient</em></div><div class="metric"><span>WIND</span><strong id="windValue">—</strong><em>km/h</em></div><div class="metric"><span>PRESSURE</span><strong id="pressureValue">—</strong><em>hPa</em></div><div class="metric"><span>HUMIDITY</span><strong id="humidityValue">—</strong><em>relative</em></div></div></div>
+    <div class="card"><div class="card-title">RISK / RESILIENCE</div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:7px"><span>RISK SCORE</span><b id="riskScore">—</b></div><div class="bar" id="riskBar"><i></i></div><div id="riskFactors" class="list" style="margin-top:9px"><div class="factor">No active risk factors</div></div></div>
+    <div class="card"><div class="card-title">TWIN HEALTH</div><div class="list"><div class="list-row"><span>DATA SOURCE</span><b id="lastSource">Demo feed</b></div><div class="list-row"><span>STATE CONTRACT</span><b>VALID</b></div><div class="list-row"><span>MODEL STATUS</span><b>HUMAN-IN-LOOP</b></div></div></div>
+    <div class="card"><div class="card-title">DECISION SIGNAL</div><div class="list"><div class="list-row"><span>POWER POLICY</span><b id="powerValue">NORMAL</b></div><div class="list-row"><span>OPERATOR</span><b>REVIEW REQUIRED</b></div></div><div style="height:8px"></div><button class="btn primary" style="width:100%" id="moduleBtn">OPEN OPERATIONAL MODULES</button></div>
+  </div>
+</aside>
+
+<section class="bottom-panel">
+  <div class="bottom-block"><div class="bottom-title"><span>HISTORICAL STATE</span><span>28 POINT WINDOW</span></div><div class="trend"><svg id="trendSvg" viewBox="0 0 620 115"></svg></div></div>
+  <div class="bottom-block"><div class="bottom-title"><span>SCENARIO LAB</span><span id="simStatus">BASELINE</span></div><div class="scenario-grid"><button class="scenario" data-scenario="cold-snap"><strong>COLD SNAP</strong><small>Temperature −10°C</small></button><button class="scenario" data-scenario="blizzard"><strong>BLIZZARD</strong><small>Wind +35 km/h</small></button><button class="scenario" data-scenario="power-cut"><strong>POWER LOSS</strong><small>Generation −25%</small></button><button class="scenario" data-scenario="safe-mode"><strong>SAFE MODE</strong><small>Protect non-critical loads</small></button></div><div class="simulation-result" id="simulationResult">Choose a scenario to run it against the current synchronized state.</div></div>
+  <div class="bottom-block"><div class="bottom-title"><span>EVENT TIMELINE</span><span>STATE THREAD</span></div><div id="eventTimeline" class="timeline"></div></div>
+</section>
+
+<div class="modal" id="modal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Scenario Lab</h3><button class="close" id="closeModal">×</button></div><div id="modalBody"></div></div></div><div id="modalBackdrop" style="display:none"></div>
+<script src="framework-v2.js?v=1"></script>
+<script>setInterval(()=>{const e=document.getElementById('utc');if(e)e.textContent=new Date().toISOString().slice(11,19)+' UTC'},1000);</script>
+</body></html>
